@@ -6,5 +6,6 @@
 - przechowywanie obiektów z gry 
 - market
   - zlecenia kupna/sprzedaży
+  - kup teraz / licytacja
 - normalne sklepy
 
