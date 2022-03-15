@@ -13,5 +13,4 @@
 - market
   - buy/sell orders
   - buy now/bidding
-- NPC shops
-  - 
+NPC shops
