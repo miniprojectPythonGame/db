@@ -1,11 +1,17 @@
 # miniprojectDB
-## SQL Database for DB course on sem.4 year 2 at Computer Science UST
-
-## Used dialect will be PostgreSQL (?)
-- autentykacja
-- przechowywanie obiektów z gry 
+- Tomasz Ostafin
+- Piotr Witek
+- Jędrzej Ziebura
+## SQL Database for DB course on semester 4 year 2 at Computer Science UST
+## Technologies:
+- Backend: Python
+- Frontend: Pygame
+- Database dialect: PostgreSQL
+## Functionalities:
+- authentication
+- storing objects from the game 
 - market
-  - zlecenia kupna/sprzedaży
-  - kup teraz / licytacja
-- normalne sklepy
-
+  - buy/sell orders
+  - buy now/bidding
+- NPC shops
+  - 
