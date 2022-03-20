@@ -110,7 +110,7 @@ CREATE TABLE Items
 CREATE TABLE Levels
 (
     level_id serial,
-    exp      int NOT NULL,
+    exp      bigint not null,
     CONSTRAINT Levels_pk PRIMARY KEY (level_id)
 );
 
@@ -147,23 +147,24 @@ CREATE TABLE Quests
     CONSTRAINT Quests_pk PRIMARY KEY (quest_id)
 );
 
--- Table: Statistics
-CREATE TABLE Statistics
+-- auto-generated definition
+create table statistics
 (
-    statistics_id serial,
-    strength      int NOT NULL,
-    intelligence  int NOT NULL,
-    dexterity     int NOT NULL,
-    constitution  int NOT NULL,
-    luck          int NOT NULL,
-    protection    int NOT NULL,
-    hp            int NOT NULL,
-    persuasion    int NOT NULL,
-    trade         int NOT NULL,
-    leadership    int NOT NULL,
-    Bots_bot_id   int NOT NULL,
-    CONSTRAINT Statistics_pk PRIMARY KEY (statistics_id)
+    statistics_id serial
+        constraint statistics_pk
+            primary key,
+    strength      integer not null,
+    intelligence  integer not null,
+    dexterity     integer not null,
+    constitution  integer not null,
+    luck          integer not null,
+    protection    integer not null,
+    hp            integer not null,
+    persuasion    integer not null,
+    trade         integer not null,
+    leadership    integer not null
 );
+
 
 -- Table: Storage
 CREATE TABLE Storage
