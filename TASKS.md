@@ -21,21 +21,21 @@
 # Piotrek
 
 ## levels
-- exp
+~~- exp~~
 
 ## players
-- sex
-- email
-- age
+~~- sex~~
+~~- email~~
+~~- age~~
 
 ## quests
-- min_lvl
-- gold_reward
-- exp_reward
+~~- min_lvl~~
+~~- gold_reward~~
+~~- exp_reward~~
 
 ## storage
-- amount
-- available
+~~- amount~~
+~~- available~~
 
 
 # Jędrzej
