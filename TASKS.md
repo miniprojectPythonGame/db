@@ -41,18 +41,18 @@
 # Jędrzej
 
 ## auctioneditems
-- current_price & start_price > 0 [x]
-- auction_end_date & auction_start_date [x]
+- current_price & start_price > 0 - [x]
+- auction_end_date & auction_start_date - [x]
 
 ## bots
 - lvl [x]
-- bot_class w - warrior, a - archer, m - mage [x]
-- is_friendly 0 false  or 1 true [x]
+- bot_class w - warrior, a - archer, m - mage - [x]
+- is_friendly 0 false  or 1 true - [x]
 
 ## buynowitems
-- selling_price >0 [x]
-- amount > 0 [x]
-- post_date [x]
+- selling_price >0 - [x]
+- amount > 0 - [x]
+- post_date - [x]
 
 
 todo
