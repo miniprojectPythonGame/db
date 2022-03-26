@@ -21,22 +21,21 @@
 # Piotrek
 
 ## levels
-~~- exp~~
+- [x] exp
 
 ## players
-~~- sex~~
-~~- email~~
-~~- age~~
+- [x] sex
+- [x] email
+- [x] age
 
 ## quests
-~~- min_lvl~~
-~~- gold_reward~~
-~~- exp_reward~~
+- [x] min_lvl
+- [x] gold_reward
+- [x] exp_reward
 
 ## storage
-~~- amount~~
-~~- available~~
-
+- [x] amount
+- [x] available
 
 # Jędrzej
 
@@ -54,7 +53,10 @@
 - [x] amount > 0
 - [x] post_date
 
-
-todo
+# Procedures to add:
+- [ ] addPlayer
+- [ ] addHero
+- [ ] removeHero
+- [ ] removePlayer
 
 
