@@ -54,9 +54,9 @@
 - [x] post_date
 
 # Procedures to add:
-- [ ] addPlayer
-- [ ] addHero
-- [ ] removeHero
-- [ ] removePlayer
+- [x] addPlayer
+- [x] addHero
+- [x] removeHero
+- [x] removePlayer
 
 

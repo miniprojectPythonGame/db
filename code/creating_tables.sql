@@ -456,3 +456,10 @@ CREATE SEQUENCE Trainers_seq
 
 -- End of file.
 
+alter table heroes
+    alter column guild_id drop not null;
+
+alter table players drop constraint players_email_check;
+
+ALTER TABLE players
+    add constraint players_email_check check (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$');
