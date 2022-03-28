@@ -40,21 +40,23 @@ begin
 end;
 $$;
 
-create procedure add_player(IN nick_ character varying, IN email_ character varying, IN sex_ character, IN age_ integer)
+create procedure add_player(IN nick_ character varying, IN email_ character varying, IN sex_ character, IN age_ integer,IN player_id_ character varying)
     language plpgsql
 as
 $$
 begin
-    insert into players (nick, email, sex, age) values (nick_, email_, sex_, age_);
+    insert into players (nick, email, sex, age,player_id) values (nick_, email_, sex_, age_,player_id_);
 end;
 $$;
 
-CREATE PROCEDURE remove_player(IN player_id_ integer) AS
+create procedure remove_player(IN player_id_ character varying)
+    language plpgsql
+as
 $$
 BEGIN
     delete from players where player_id = player_id_;
 end;
-$$ language plpgsql;
+$$;
 
 CREATE PROCEDURE remove_hero(IN hero_id_ integer) AS
 $$

@@ -1,153 +1,87 @@
--- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2022-03-18 10:46:12.311
-
--- tables
--- Table: AuctionedItems
-CREATE TABLE AuctionedItems
+create table guilds
 (
-    auctioned_item_id  serial,
-    item_id            int       NOT NULL,
-    current_price      int       NOT NULL,
-    amount             int       NOT NULL,
-    start_price        int       NOT NULL,
-    seller_id          int       NOT NULL,
-    auction_end_date   timestamp NOT NULL,
-    auction_start_date timestamp NOT NULL,
-    storage_id         int       NOT NULL,
-    CONSTRAINT AuctionedItems_pk PRIMARY KEY (auctioned_item_id)
+    guild_id       serial
+        constraint guilds_pk
+            primary key,
+    name           varchar(50)  not null,
+    gold           integer      not null,
+    description    varchar(500) not null,
+    leader_id      integer      not null,
+    vice_leader_id integer      not null
 );
 
--- Table: Bots
-CREATE TABLE Bots
+alter table guilds
+    owner to avnadmin;
+
+create table itemtypes
 (
-    bot_id        serial,
-    name          varchar(50) NOT NULL,
-    lvl           int         NOT NULL,
-    bot_class     char(1)     NOT NULL,
-    is_friendly   smallint    NOT NULL,
-    statistics_id int         NOT NULL,
-    CONSTRAINT Bots_ak_1 UNIQUE (statistics_id) NOT DEFERRABLE INITIALLY IMMEDIATE,
-    CONSTRAINT Bots_pk PRIMARY KEY (bot_id)
+    item_type_id serial
+        constraint itemtypes_pk
+            primary key,
+    type_name    varchar(50)  not null,
+    description  varchar(128) not null
 );
 
--- Table: BuyNowItems
-CREATE TABLE BuyNowItems
+alter table itemtypes
+    owner to avnadmin;
+
+create table levels
 (
-    buy_now_item_id serial,
-    item_id         int       NOT NULL,
-    selling_price   int       NOT NULL,
-    amount          int       NOT NULL,
-    seller_id       int       NOT NULL,
-    post_date       timestamp NOT NULL,
-    storage_id      int       NOT NULL,
-    CONSTRAINT BuyNowItems_pk PRIMARY KEY (buy_now_item_id)
+    level_id serial
+        constraint levels_pk
+            primary key,
+    exp      bigint not null
+        constraint levels_exp_check
+            check (exp > 0)
 );
 
--- Table: BuyOrders
-CREATE TABLE BuyOrders
+alter table levels
+    owner to avnadmin;
+
+create table players
 (
-    buy_order_id      serial,
-    buyer_id          int       NOT NULL,
-    amount            int       NOT NULL,
-    item_id           int       NOT NULL,
-    target_unit_price int       NOT NULL,
-    order_date        timestamp NOT NULL,
-    CONSTRAINT BuyOrders_pk PRIMARY KEY (buy_order_id)
+    nick      varchar(50) not null,
+    email     varchar(50) not null
+        constraint players_email_check
+            check ((email)::text ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text),
+    sex       char
+        constraint players_sex_check
+            check ((sex = 'm'::bpchar) OR (sex = 'f'::bpchar)),
+    age       integer     not null
+        constraint players_age_check
+            check (age >= 16),
+    player_id varchar(50) not null
+        constraint players_pk
+            primary key
 );
 
--- Table: Guilds
-CREATE TABLE Guilds
+alter table players
+    owner to avnadmin;
+
+create unique index players_player_id_uindex
+    on players (player_id);
+
+create table quests
 (
-    guild_id       serial,
-    name           varchar(50)  NOT NULL,
-    gold           int          NOT NULL,
-    description    varchar(500) NOT NULL,
-    leader_id      int          NOT NULL,
-    vice_leader_id int          NOT NULL,
-    CONSTRAINT Guilds_pk PRIMARY KEY (guild_id)
+    quest_id    serial
+        constraint quests_pk
+            primary key,
+    name        varchar(50)  not null,
+    description varchar(500) not null,
+    min_lvl     integer      not null
+        constraint quests_min_lvl_check
+            check (min_lvl >= 1),
+    gold_reward integer      not null
+        constraint quests_gold_reward_check
+            check (gold_reward > 0),
+    exp_reward  integer      not null
+        constraint quests_exp_reward_check
+            check (exp_reward > 0)
 );
 
--- Table: Heroes
-CREATE TABLE Heroes
-(
-    name          varchar(50) NOT NULL,
-    player_id     int         NOT NULL,
-    hero_id       serial,
-    gold          int         NOT NULL,
-    level_id      int         NOT NULL,
-    exp           int         NOT NULL,
-    hero_class    char(1)     NOT NULL,
-    statistics_id int         NOT NULL,
-    guild_id      int         NOT NULL,
-    CONSTRAINT Heroes_ak_1 UNIQUE (player_id) NOT DEFERRABLE INITIALLY IMMEDIATE,
-    CONSTRAINT Heroes_pk PRIMARY KEY (hero_id)
-);
+alter table quests
+    owner to avnadmin;
 
--- Table: ItemTypes
-CREATE TABLE ItemTypes
-(
-    item_type_id serial,
-    type_name    varchar(50)  NOT NULL,
-    description  varchar(128) NOT NULL,
-    CONSTRAINT ItemTypes_pk PRIMARY KEY (item_type_id)
-);
-
--- Table: Items
-CREATE TABLE Items
-(
-    item_id       serial,
-    name          varchar(50)  NOT NULL,
-    price         int          NOT NULL,
-    description   varchar(128) NOT NULL,
-    only_treasure smallint     NOT NULL,
-    statistics_id int          NOT NULL,
-    item_type_id  int          NOT NULL,
-    min_lvl       int          NOT NULL,
-    CONSTRAINT Items_pk PRIMARY KEY (item_id)
-);
-
--- Table: Levels
-CREATE TABLE Levels
-(
-    level_id serial,
-    exp      bigint not null,
-    CONSTRAINT Levels_pk PRIMARY KEY (level_id)
-);
-
--- Table: Maps
-CREATE TABLE Maps
-(
-    map_id           serial,
-    background_image bytea        NOT NULL,
-    name             varchar(50)  NOT NULL,
-    description      varchar(128) NOT NULL,
-    CONSTRAINT Maps_pk PRIMARY KEY (map_id)
-);
-
--- Table: Players
-CREATE TABLE Players
-(
-    nick      varchar(50) NOT NULL,
-    email     varchar(50) NOT NULL,
-    sex       char(1)     NULL,
-    age       int         NOT NULL,
-    player_id serial,
-    CONSTRAINT Players_pk PRIMARY KEY (player_id)
-);
-
--- Table: Quests
-CREATE TABLE Quests
-(
-    quest_id    serial,
-    name        varchar(50)  NOT NULL,
-    description varchar(500) NOT NULL,
-    min_lvl     int          NOT NULL,
-    gold_reward int          NOT NULL,
-    exp_reward  int          NOT NULL,
-    CONSTRAINT Quests_pk PRIMARY KEY (quest_id)
-);
-
--- auto-generated definition
 create table statistics
 (
     statistics_id serial
@@ -165,301 +99,202 @@ create table statistics
     leadership    integer not null
 );
 
+alter table statistics
+    owner to avnadmin;
 
--- Table: Storage
-CREATE TABLE Storage
+create table bots
 (
-    item_slot_id   int      NOT NULL,
-    item_id        int      NOT NULL,
-    amount         int      NOT NULL,
-    available      smallint NOT NULL,
-    hero_id        int      NOT NULL,
-    Heroes_hero_id int      NOT NULL,
-    Items_item_id  int      NOT NULL,
-    storage_id     serial,
-    CONSTRAINT Storage_pk PRIMARY KEY (storage_id)
+    bot_id        serial
+        constraint bots_pk
+            primary key,
+    name          varchar(50) not null,
+    lvl           integer     not null
+        constraint lvl_check
+            check (lvl >= 0),
+    bot_class     char        not null
+        constraint bot_class
+            check ((bot_class = 'w'::bpchar) OR (bot_class = 'a'::bpchar) OR (bot_class = 'm'::bpchar)),
+    is_friendly   smallint    not null
+        constraint friendliness
+            check ((is_friendly = 0) OR (is_friendly = 1)),
+    statistics_id integer     not null
+        constraint bots_ak_1
+            unique
+        constraint fk_statistics
+            references statistics
 );
 
--- Table: Trainers
-CREATE TABLE Trainers
+alter table bots
+    owner to avnadmin;
+
+create table heroes
 (
-    trainer_id  serial,
-    name        varchar(50)  NOT NULL,
-    description varchar(500) NOT NULL,
-    map_id      int          NOT NULL,
-    CONSTRAINT map_id UNIQUE (map_id) NOT DEFERRABLE INITIALLY IMMEDIATE,
-    CONSTRAINT Trainers_pk PRIMARY KEY (trainer_id)
+    name          varchar(50) not null,
+    player_id     varchar(50) not null
+        constraint heroes_ak_1
+            unique
+        constraint fk_players
+            references players,
+    hero_id       serial
+        constraint heroes_pk
+            primary key,
+    gold          integer     not null,
+    level_id      integer     not null
+        constraint levels_heroes
+            references levels,
+    exp           integer     not null,
+    hero_class    char        not null,
+    statistics_id integer     not null
+        constraint heroes_creaturestatistics
+            references statistics,
+    guild_id      integer
+        constraint guild_heroes
+            references guilds
 );
-
--- foreign keys
--- Reference: AuctionedItems_Storage (table: AuctionedItems)
-ALTER TABLE AuctionedItems
-    ADD CONSTRAINT AuctionedItems_Storage
-        FOREIGN KEY (storage_id)
-            REFERENCES Storage (storage_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: BuyOrders_Items (table: BuyOrders)
-ALTER TABLE BuyOrders
-    ADD CONSTRAINT BuyOrders_Items
-        FOREIGN KEY (item_id)
-            REFERENCES Items (item_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Guild_Heroes (table: Heroes)
-ALTER TABLE Heroes
-    ADD CONSTRAINT Guild_Heroes
-        FOREIGN KEY (guild_id)
-            REFERENCES Guilds (guild_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Heroes_BuyOrders (table: BuyOrders)
-ALTER TABLE BuyOrders
-    ADD CONSTRAINT Heroes_BuyOrders
-        FOREIGN KEY (buyer_id)
-            REFERENCES Heroes (hero_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Heroes_CreatureStatistics (table: Heroes)
-ALTER TABLE Heroes
-    ADD CONSTRAINT Heroes_CreatureStatistics
-        FOREIGN KEY (statistics_id)
-            REFERENCES Statistics (statistics_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Heroes_Players (table: Heroes)
-ALTER TABLE Heroes
-    ADD CONSTRAINT Heroes_Players
-        FOREIGN KEY (player_id)
-            REFERENCES Players (player_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Heroes_Storage (table: Storage)
-ALTER TABLE Storage
-    ADD CONSTRAINT Heroes_Storage
-        FOREIGN KEY (hero_id)
-            REFERENCES Heroes (hero_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Items_ItemTypes (table: Items)
-ALTER TABLE Items
-    ADD CONSTRAINT Items_ItemTypes
-        FOREIGN KEY (item_type_id)
-            REFERENCES ItemTypes (item_type_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Items_Statistics (table: Items)
-ALTER TABLE Items
-    ADD CONSTRAINT Items_Statistics
-        FOREIGN KEY (statistics_id)
-            REFERENCES Statistics (statistics_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Levels_Heroes (table: Heroes)
-ALTER TABLE Heroes
-    ADD CONSTRAINT Levels_Heroes
-        FOREIGN KEY (level_id)
-            REFERENCES Levels (level_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Statistics_Bots (table: Statistics)
-ALTER TABLE Statistics
-    ADD CONSTRAINT Statistics_Bots
-        FOREIGN KEY (statistics_id)
-            REFERENCES Bots (statistics_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Storage_BuyNowItems (table: BuyNowItems)
-ALTER TABLE BuyNowItems
-    ADD CONSTRAINT Storage_BuyNowItems
-        FOREIGN KEY (storage_id)
-            REFERENCES Storage (storage_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Storage_Items (table: Storage)
-ALTER TABLE Storage
-    ADD CONSTRAINT Storage_Items
-        FOREIGN KEY (item_id)
-            REFERENCES Items (item_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- Reference: Trainer_Maps (table: Maps)
-ALTER TABLE Maps
-    ADD CONSTRAINT Trainer_Maps
-        FOREIGN KEY (map_id)
-            REFERENCES Trainers (map_id)
-            NOT DEFERRABLE
-                INITIALLY IMMEDIATE
-;
-
--- sequences
--- Sequence: AuctionedItems_seq
-CREATE SEQUENCE AuctionedItems_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Bots_seq
-CREATE SEQUENCE Bots_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: BuyNowItems_seq
-CREATE SEQUENCE BuyNowItems_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: BuyOrders_seq
-CREATE SEQUENCE BuyOrders_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Guilds_seq
-CREATE SEQUENCE Guilds_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Heroes_seq
-CREATE SEQUENCE Heroes_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: ItemTypes_seq
-CREATE SEQUENCE ItemTypes_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Items_seq
-CREATE SEQUENCE Items_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Levels_seq
-CREATE SEQUENCE Levels_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Maps_seq
-CREATE SEQUENCE Maps_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Players_seq
-CREATE SEQUENCE Players_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Quests_seq
-CREATE SEQUENCE Quests_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Statistics_seq
-CREATE SEQUENCE Statistics_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Storage_seq
-CREATE SEQUENCE Storage_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- Sequence: Trainers_seq
-CREATE SEQUENCE Trainers_seq
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    START WITH 1
-    NO CYCLE
-;
-
--- End of file.
 
 alter table heroes
-    alter column guild_id drop not null;
+    owner to avnadmin;
 
-alter table players drop constraint players_email_check;
+create table items
+(
+    item_id       serial
+        constraint items_pk
+            primary key,
+    name          varchar(50)  not null,
+    price         integer      not null,
+    description   varchar(500) not null,
+    only_treasure smallint     not null,
+    statistics_id integer      not null
+        constraint items_statistics
+            references statistics,
+    item_type_id  integer      not null
+        constraint items_itemtypes
+            references itemtypes,
+    min_lvl       integer      not null
+);
 
-ALTER TABLE players
-    add constraint players_email_check check (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$');
+alter table items
+    owner to avnadmin;
+
+create table buyorders
+(
+    buy_order_id      serial
+        constraint buyorders_pk
+            primary key,
+    buyer_id          integer   not null
+        constraint heroes_buyorders
+            references heroes,
+    amount            integer   not null,
+    item_id           integer   not null
+        constraint buyorders_items
+            references items,
+    target_unit_price integer   not null,
+    order_date        timestamp not null
+);
+
+alter table buyorders
+    owner to avnadmin;
+
+create table storage
+(
+    item_slot_id   integer  not null,
+    item_id        integer  not null
+        constraint storage_items
+            references items,
+    amount         integer  not null
+        constraint storage_amount_check
+            check (amount >= 9),
+    available      smallint not null,
+    hero_id        integer  not null
+        constraint heroes_storage
+            references heroes,
+    heroes_hero_id integer  not null,
+    items_item_id  integer  not null,
+    storage_id     serial
+        constraint storage_pk
+            primary key,
+    constraint storage_check
+        check ((available > 0) AND (available <= amount))
+);
+
+alter table storage
+    owner to avnadmin;
+
+create table auctioneditems
+(
+    auctioned_item_id  serial
+        constraint auctioneditems_pk
+            primary key,
+    item_id            integer   not null,
+    current_price      integer   not null
+        constraint positive_curr_price
+            check (current_price > 0),
+    amount             integer   not null,
+    start_price        integer   not null
+        constraint positive_start_price
+            check (start_price > 0),
+    seller_id          integer   not null,
+    auction_end_date   timestamp not null,
+    auction_start_date timestamp not null,
+    storage_id         integer   not null
+        constraint auctioneditems_storage
+            references storage
+);
+
+alter table auctioneditems
+    owner to avnadmin;
+
+create table buynowitems
+(
+    buy_now_item_id serial
+        constraint buynowitems_pk
+            primary key,
+    item_id         integer   not null,
+    selling_price   integer   not null
+        constraint positive_selling_price
+            check (selling_price > 0),
+    amount          integer   not null
+        constraint positive_amount
+            check (amount > 0),
+    seller_id       integer   not null,
+    post_date       timestamp not null
+        constraint post_date
+            check (post_date <= CURRENT_DATE),
+    storage_id      integer   not null
+        constraint storage_buynowitems
+            references storage
+);
+
+alter table buynowitems
+    owner to avnadmin;
+
+create table trainers
+(
+    trainer_id  serial
+        constraint trainers_pk
+            primary key,
+    name        varchar(50)  not null,
+    description varchar(500) not null,
+    map_id      integer      not null
+        constraint map_id
+            unique
+);
+
+alter table trainers
+    owner to avnadmin;
+
+create table maps
+(
+    map_id           serial
+        constraint maps_pk
+            primary key
+        constraint trainer_maps
+            references trainers (map_id),
+    background_image bytea        not null,
+    name             varchar(50)  not null,
+    description      varchar(128) not null
+);
+
+alter table maps
+    owner to avnadmin;
+
