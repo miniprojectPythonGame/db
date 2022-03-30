@@ -1,4 +1,4 @@
-create table guilds
+create table if not exists guilds
 (
     guild_id       serial
         constraint guilds_pk
@@ -13,7 +13,7 @@ create table guilds
 alter table guilds
     owner to avnadmin;
 
-create table itemtypes
+create table if not exists itemtypes
 (
     item_type_id serial
         constraint itemtypes_pk
@@ -25,7 +25,7 @@ create table itemtypes
 alter table itemtypes
     owner to avnadmin;
 
-create table levels
+create table if not exists levels
 (
     level_id serial
         constraint levels_pk
@@ -38,7 +38,7 @@ create table levels
 alter table levels
     owner to avnadmin;
 
-create table players
+create table if not exists players
 (
     nick      varchar(50) not null,
     email     varchar(50) not null
@@ -58,10 +58,7 @@ create table players
 alter table players
     owner to avnadmin;
 
-create unique index players_player_id_uindex
-    on players (player_id);
-
-create table quests
+create table if not exists quests
 (
     quest_id    serial
         constraint quests_pk
@@ -82,7 +79,7 @@ create table quests
 alter table quests
     owner to avnadmin;
 
-create table statistics
+create table if not exists statistics
 (
     statistics_id serial
         constraint statistics_pk
@@ -92,17 +89,17 @@ create table statistics
     dexterity     integer not null,
     constitution  integer not null,
     luck          integer not null,
-    protection    integer not null,
-    hp            integer not null,
     persuasion    integer not null,
     trade         integer not null,
-    leadership    integer not null
+    leadership    integer not null,
+    protection    integer not null,
+    initiative    integer not null
 );
 
 alter table statistics
     owner to avnadmin;
 
-create table bots
+create table if not exists bots
 (
     bot_id        serial
         constraint bots_pk
@@ -127,14 +124,10 @@ create table bots
 alter table bots
     owner to avnadmin;
 
-create table heroes
+create table if not exists heroes
 (
     name          varchar(50) not null,
-    player_id     varchar(50) not null
-        constraint heroes_ak_1
-            unique
-        constraint fk_players
-            references players,
+    player_id     varchar(50) not null,
     hero_id       serial
         constraint heroes_pk
             primary key,
@@ -155,7 +148,13 @@ create table heroes
 alter table heroes
     owner to avnadmin;
 
-create table items
+create trigger hero_del_trig
+    after delete
+    on heroes
+    for each row
+execute procedure remove_statistics();
+
+create table if not exists items
 (
     item_id       serial
         constraint items_pk
@@ -176,7 +175,7 @@ create table items
 alter table items
     owner to avnadmin;
 
-create table buyorders
+create table if not exists buyorders
 (
     buy_order_id      serial
         constraint buyorders_pk
@@ -195,7 +194,13 @@ create table buyorders
 alter table buyorders
     owner to avnadmin;
 
-create table storage
+create trigger item_del_trig
+    after delete
+    on items
+    for each row
+execute procedure remove_statistics();
+
+create table if not exists storage
 (
     item_slot_id   integer  not null,
     item_id        integer  not null
@@ -220,7 +225,7 @@ create table storage
 alter table storage
     owner to avnadmin;
 
-create table auctioneditems
+create table if not exists auctioneditems
 (
     auctioned_item_id  serial
         constraint auctioneditems_pk
@@ -244,7 +249,7 @@ create table auctioneditems
 alter table auctioneditems
     owner to avnadmin;
 
-create table buynowitems
+create table if not exists buynowitems
 (
     buy_now_item_id serial
         constraint buynowitems_pk
@@ -268,7 +273,7 @@ create table buynowitems
 alter table buynowitems
     owner to avnadmin;
 
-create table trainers
+create table if not exists trainers
 (
     trainer_id  serial
         constraint trainers_pk
@@ -283,7 +288,7 @@ create table trainers
 alter table trainers
     owner to avnadmin;
 
-create table maps
+create table if not exists maps
 (
     map_id           serial
         constraint maps_pk
