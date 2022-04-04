@@ -1,4 +1,4 @@
-create table if not exists guilds
+create table guilds
 (
     guild_id       serial
         constraint guilds_pk
@@ -13,19 +13,18 @@ create table if not exists guilds
 alter table guilds
     owner to avnadmin;
 
-create table if not exists itemtypes
+create table itemtypes
 (
     item_type_id serial
         constraint itemtypes_pk
             primary key,
-    type_name    varchar(50)  not null,
-    description  varchar(128) not null
+    type_name    varchar(50) not null
 );
 
 alter table itemtypes
     owner to avnadmin;
 
-create table if not exists levels
+create table levels
 (
     level_id serial
         constraint levels_pk
@@ -38,7 +37,7 @@ create table if not exists levels
 alter table levels
     owner to avnadmin;
 
-create table if not exists players
+create table players
 (
     nick      varchar(50) not null,
     email     varchar(50) not null
@@ -58,7 +57,13 @@ create table if not exists players
 alter table players
     owner to avnadmin;
 
-create table if not exists quests
+create trigger player_del_trig
+    after delete
+    on players
+    for each row
+execute procedure remove_all_heroes();
+
+create table quests
 (
     quest_id    serial
         constraint quests_pk
@@ -79,7 +84,7 @@ create table if not exists quests
 alter table quests
     owner to avnadmin;
 
-create table if not exists statistics
+create table statistics
 (
     statistics_id serial
         constraint statistics_pk
@@ -99,7 +104,7 @@ create table if not exists statistics
 alter table statistics
     owner to avnadmin;
 
-create table if not exists bots
+create table bots
 (
     bot_id        serial
         constraint bots_pk
@@ -124,25 +129,27 @@ create table if not exists bots
 alter table bots
     owner to avnadmin;
 
-create table if not exists heroes
+create table heroes
 (
-    name          varchar(50) not null,
-    player_id     varchar(50) not null,
-    hero_id       serial
+    name                 varchar(50) not null,
+    player_id            varchar(50) not null,
+    hero_id              serial
         constraint heroes_pk
             primary key,
-    gold          integer     not null,
-    level_id      integer     not null
+    gold                 integer     not null,
+    level_id             integer     not null
         constraint levels_heroes
             references levels,
-    exp           integer     not null,
-    hero_class    char        not null,
-    statistics_id integer     not null
+    exp                  integer     not null,
+    hero_class           char        not null,
+    statistics_id        integer     not null
         constraint heroes_creaturestatistics
             references statistics,
-    guild_id      integer
+    guild_id             integer
         constraint guild_heroes
-            references guilds
+            references guilds,
+    free_development_pts integer     not null,
+    exp_next_lvl         integer     not null
 );
 
 alter table heroes
@@ -154,7 +161,7 @@ create trigger hero_del_trig
     for each row
 execute procedure remove_statistics();
 
-create table if not exists items
+create table items
 (
     item_id       serial
         constraint items_pk
@@ -169,13 +176,14 @@ create table if not exists items
     item_type_id  integer      not null
         constraint items_itemtypes
             references itemtypes,
-    min_lvl       integer      not null
+    min_lvl       integer      not null,
+    for_class     char
 );
 
 alter table items
     owner to avnadmin;
 
-create table if not exists buyorders
+create table buyorders
 (
     buy_order_id      serial
         constraint buyorders_pk
@@ -200,32 +208,26 @@ create trigger item_del_trig
     for each row
 execute procedure remove_statistics();
 
-create table if not exists storage
+create table storage
 (
-    item_slot_id   integer  not null,
-    item_id        integer  not null
+    item_slot_id integer,
+    item_id      integer
         constraint storage_items
             references items,
-    amount         integer  not null
-        constraint storage_amount_check
-            check (amount >= 9),
-    available      smallint not null,
-    hero_id        integer  not null
+    amount       integer  not null,
+    available    smallint not null,
+    hero_id      integer  not null
         constraint heroes_storage
             references heroes,
-    heroes_hero_id integer  not null,
-    items_item_id  integer  not null,
-    storage_id     serial
+    storage_id   serial
         constraint storage_pk
-            primary key,
-    constraint storage_check
-        check ((available > 0) AND (available <= amount))
+            primary key
 );
 
 alter table storage
     owner to avnadmin;
 
-create table if not exists auctioneditems
+create table auctioneditems
 (
     auctioned_item_id  serial
         constraint auctioneditems_pk
@@ -249,7 +251,7 @@ create table if not exists auctioneditems
 alter table auctioneditems
     owner to avnadmin;
 
-create table if not exists buynowitems
+create table buynowitems
 (
     buy_now_item_id serial
         constraint buynowitems_pk
@@ -273,7 +275,10 @@ create table if not exists buynowitems
 alter table buynowitems
     owner to avnadmin;
 
-create table if not exists trainers
+create unique index storage_item_slot_id_uindex
+    on storage (item_slot_id);
+
+create table trainers
 (
     trainer_id  serial
         constraint trainers_pk
@@ -288,7 +293,7 @@ create table if not exists trainers
 alter table trainers
     owner to avnadmin;
 
-create table if not exists maps
+create table maps
 (
     map_id           serial
         constraint maps_pk

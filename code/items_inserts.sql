@@ -1,1 +1,0 @@
-call add_item ('Bin-search bow',500,'Legend says that every released arrow spilt the enemy in 2 halves',0::smallint,1,10,10,30,50,0,0,0,0,0,0,0);
