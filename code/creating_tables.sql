@@ -177,11 +177,18 @@ create table items
         constraint items_itemtypes
             references itemtypes,
     min_lvl       integer      not null,
-    for_class     char
+    for_class     char,
+    owner_id      integer
 );
 
 alter table items
     owner to avnadmin;
+
+create trigger item_del_trig
+    after delete
+    on items
+    for each row
+execute procedure remove_statistics();
 
 create table buyorders
 (
@@ -202,12 +209,6 @@ create table buyorders
 alter table buyorders
     owner to avnadmin;
 
-create trigger item_del_trig
-    after delete
-    on items
-    for each row
-execute procedure remove_statistics();
-
 create table storage
 (
     item_slot_id integer,
@@ -226,6 +227,9 @@ create table storage
 
 alter table storage
     owner to avnadmin;
+
+create unique index storage_item_slot_id_uindex
+    on storage (item_slot_id);
 
 create table auctioneditems
 (
@@ -275,9 +279,6 @@ create table buynowitems
 alter table buynowitems
     owner to avnadmin;
 
-create unique index storage_item_slot_id_uindex
-    on storage (item_slot_id);
-
 create table trainers
 (
     trainer_id  serial
@@ -307,4 +308,64 @@ create table maps
 
 alter table maps
     owner to avnadmin;
+
+create table armour_shop
+(
+    item_id integer,
+    hero_id integer not null,
+    id      serial
+        constraint armour_shop_pk
+            primary key
+);
+
+alter table armour_shop
+    owner to avnadmin;
+
+create unique index armour_shop_id_uindex
+    on armour_shop (id);
+
+create table magic_shop
+(
+    id      serial
+        constraint magic_shop_pk
+            primary key,
+    item_id integer,
+    hero_id integer not null
+);
+
+alter table magic_shop
+    owner to avnadmin;
+
+create unique index magic_shop_id_uindex
+    on magic_shop (id);
+
+create table weapon_shop
+(
+    id      serial
+        constraint weapon_shop_pk
+            primary key,
+    hero_id integer not null,
+    item_id integer
+);
+
+alter table weapon_shop
+    owner to avnadmin;
+
+create unique index weapon_shop_id_uindex
+    on weapon_shop (id);
+
+create table stable_shop
+(
+    id      serial
+        constraint stable_shop_pk
+            primary key,
+    hero_id integer not null,
+    item_id integer
+);
+
+alter table stable_shop
+    owner to avnadmin;
+
+create unique index stable_shop_id_uindex
+    on stable_shop (id);
 

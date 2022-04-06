@@ -1,3 +1,101 @@
+create sequence guilds_guild_id_seq
+    as integer;
+
+alter sequence guilds_guild_id_seq owner to avnadmin;
+
+alter sequence guilds_guild_id_seq owned by guilds.guild_id;
+
+create sequence itemtypes_item_type_id_seq
+    as integer;
+
+alter sequence itemtypes_item_type_id_seq owner to avnadmin;
+
+alter sequence itemtypes_item_type_id_seq owned by itemtypes.item_type_id;
+
+create sequence levels_level_id_seq
+    as integer;
+
+alter sequence levels_level_id_seq owner to avnadmin;
+
+alter sequence levels_level_id_seq owned by levels.level_id;
+
+create sequence quests_quest_id_seq
+    as integer;
+
+alter sequence quests_quest_id_seq owner to avnadmin;
+
+alter sequence quests_quest_id_seq owned by quests.quest_id;
+
+create sequence statistics_statistics_id_seq
+    as integer;
+
+alter sequence statistics_statistics_id_seq owner to avnadmin;
+
+alter sequence statistics_statistics_id_seq owned by statistics.statistics_id;
+
+create sequence bots_bot_id_seq
+    as integer;
+
+alter sequence bots_bot_id_seq owner to avnadmin;
+
+alter sequence bots_bot_id_seq owned by bots.bot_id;
+
+create sequence heroes_hero_id_seq
+    as integer;
+
+alter sequence heroes_hero_id_seq owner to avnadmin;
+
+alter sequence heroes_hero_id_seq owned by heroes.hero_id;
+
+create sequence items_item_id_seq
+    as integer;
+
+alter sequence items_item_id_seq owner to avnadmin;
+
+alter sequence items_item_id_seq owned by items.item_id;
+
+create sequence buyorders_buy_order_id_seq
+    as integer;
+
+alter sequence buyorders_buy_order_id_seq owner to avnadmin;
+
+alter sequence buyorders_buy_order_id_seq owned by buyorders.buy_order_id;
+
+create sequence storage_storage_id_seq
+    as integer;
+
+alter sequence storage_storage_id_seq owner to avnadmin;
+
+alter sequence storage_storage_id_seq owned by storage.storage_id;
+
+create sequence auctioneditems_auctioned_item_id_seq
+    as integer;
+
+alter sequence auctioneditems_auctioned_item_id_seq owner to avnadmin;
+
+alter sequence auctioneditems_auctioned_item_id_seq owned by auctioneditems.auctioned_item_id;
+
+create sequence buynowitems_buy_now_item_id_seq
+    as integer;
+
+alter sequence buynowitems_buy_now_item_id_seq owner to avnadmin;
+
+alter sequence buynowitems_buy_now_item_id_seq owned by buynowitems.buy_now_item_id;
+
+create sequence trainers_trainer_id_seq
+    as integer;
+
+alter sequence trainers_trainer_id_seq owner to avnadmin;
+
+alter sequence trainers_trainer_id_seq owned by trainers.trainer_id;
+
+create sequence maps_map_id_seq
+    as integer;
+
+alter sequence maps_map_id_seq owner to avnadmin;
+
+alter sequence maps_map_id_seq owned by maps.map_id;
+
 create sequence auctioneditems_seq;
 
 alter sequence auctioneditems_seq owner to avnadmin;
@@ -58,101 +156,31 @@ create sequence trainers_seq;
 
 alter sequence trainers_seq owner to avnadmin;
 
-create sequence auctioneditems_auctioned_item_id_seq
+create sequence armour_shop_id_seq
     as integer;
 
-alter sequence auctioneditems_auctioned_item_id_seq owner to avnadmin;
+alter sequence armour_shop_id_seq owner to avnadmin;
 
-alter sequence auctioneditems_auctioned_item_id_seq owned by auctioneditems.auctioned_item_id;
+alter sequence armour_shop_id_seq owned by armour_shop.id;
 
-create sequence bots_bot_id_seq
+create sequence magic_shop_id_seq
     as integer;
 
-alter sequence bots_bot_id_seq owner to avnadmin;
+alter sequence magic_shop_id_seq owner to avnadmin;
 
-alter sequence bots_bot_id_seq owned by bots.bot_id;
+alter sequence magic_shop_id_seq owned by magic_shop.id;
 
-create sequence buynowitems_buy_now_item_id_seq
+create sequence weapon_shop_id_seq
     as integer;
 
-alter sequence buynowitems_buy_now_item_id_seq owner to avnadmin;
+alter sequence weapon_shop_id_seq owner to avnadmin;
 
-alter sequence buynowitems_buy_now_item_id_seq owned by buynowitems.buy_now_item_id;
+alter sequence weapon_shop_id_seq owned by weapon_shop.id;
 
-create sequence buyorders_buy_order_id_seq
+create sequence stable_shop_id_seq
     as integer;
 
-alter sequence buyorders_buy_order_id_seq owner to avnadmin;
+alter sequence stable_shop_id_seq owner to avnadmin;
 
-alter sequence buyorders_buy_order_id_seq owned by buyorders.buy_order_id;
-
-create sequence guilds_guild_id_seq
-    as integer;
-
-alter sequence guilds_guild_id_seq owner to avnadmin;
-
-alter sequence guilds_guild_id_seq owned by guilds.guild_id;
-
-create sequence heroes_hero_id_seq
-    as integer;
-
-alter sequence heroes_hero_id_seq owner to avnadmin;
-
-alter sequence heroes_hero_id_seq owned by heroes.hero_id;
-
-create sequence items_item_id_seq
-    as integer;
-
-alter sequence items_item_id_seq owner to avnadmin;
-
-alter sequence items_item_id_seq owned by items.item_id;
-
-create sequence itemtypes_item_type_id_seq
-    as integer;
-
-alter sequence itemtypes_item_type_id_seq owner to avnadmin;
-
-alter sequence itemtypes_item_type_id_seq owned by itemtypes.item_type_id;
-
-create sequence levels_level_id_seq
-    as integer;
-
-alter sequence levels_level_id_seq owner to avnadmin;
-
-alter sequence levels_level_id_seq owned by levels.level_id;
-
-create sequence maps_map_id_seq
-    as integer;
-
-alter sequence maps_map_id_seq owner to avnadmin;
-
-alter sequence maps_map_id_seq owned by maps.map_id;
-
-create sequence quests_quest_id_seq
-    as integer;
-
-alter sequence quests_quest_id_seq owner to avnadmin;
-
-alter sequence quests_quest_id_seq owned by quests.quest_id;
-
-create sequence statistics_statistics_id_seq
-    as integer;
-
-alter sequence statistics_statistics_id_seq owner to avnadmin;
-
-alter sequence statistics_statistics_id_seq owned by statistics.statistics_id;
-
-create sequence storage_storage_id_seq
-    as integer;
-
-alter sequence storage_storage_id_seq owner to avnadmin;
-
-alter sequence storage_storage_id_seq owned by storage.storage_id;
-
-create sequence trainers_trainer_id_seq
-    as integer;
-
-alter sequence trainers_trainer_id_seq owner to avnadmin;
-
-alter sequence trainers_trainer_id_seq owned by trainers.trainer_id;
+alter sequence stable_shop_id_seq owned by stable_shop.id;
 
