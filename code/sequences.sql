@@ -182,5 +182,5 @@ create sequence stable_shop_id_seq
 
 alter sequence stable_shop_id_seq owner to avnadmin;
 
-alter sequence stable_shop_id_seq owned by stable_shop.id;
+alter sequence stable_shop_id_seq owned by steed_shop.id;
 

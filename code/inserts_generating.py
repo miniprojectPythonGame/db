@@ -25,7 +25,7 @@ def all_item_types_gen():
     ]
 
     for pair in items:
-        item_gen(pair[0],"NULL",pair[1],15)
+        item_gen(pair[0],"NULL",pair[1],10)
 
 
 def lvl_gen():

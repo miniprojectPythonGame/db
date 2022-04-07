@@ -311,11 +311,12 @@ alter table maps
 
 create table armour_shop
 (
-    item_id integer,
-    hero_id integer not null,
-    id      serial
+    item_id      integer,
+    hero_id      integer not null,
+    id           serial
         constraint armour_shop_pk
-            primary key
+            primary key,
+    item_slot_id integer not null
 );
 
 alter table armour_shop
@@ -326,11 +327,12 @@ create unique index armour_shop_id_uindex
 
 create table magic_shop
 (
-    id      serial
+    id           serial
         constraint magic_shop_pk
             primary key,
-    item_id integer,
-    hero_id integer not null
+    item_id      integer,
+    hero_id      integer not null,
+    item_slot_id integer not null
 );
 
 alter table magic_shop
@@ -341,11 +343,12 @@ create unique index magic_shop_id_uindex
 
 create table weapon_shop
 (
-    id      serial
+    id           serial
         constraint weapon_shop_pk
             primary key,
-    hero_id integer not null,
-    item_id integer
+    hero_id      integer not null,
+    item_id      integer,
+    item_slot_id integer not null
 );
 
 alter table weapon_shop
@@ -354,18 +357,19 @@ alter table weapon_shop
 create unique index weapon_shop_id_uindex
     on weapon_shop (id);
 
-create table stable_shop
+create table steed_shop
 (
-    id      serial
+    id           integer default nextval('stable_shop_id_seq'::regclass) not null
         constraint stable_shop_pk
             primary key,
-    hero_id integer not null,
-    item_id integer
+    hero_id      integer                                                 not null,
+    item_id      integer,
+    item_slot_id integer                                                 not null
 );
 
-alter table stable_shop
+alter table steed_shop
     owner to avnadmin;
 
 create unique index stable_shop_id_uindex
-    on stable_shop (id);
+    on steed_shop (id);
 
