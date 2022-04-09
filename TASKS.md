@@ -1,22 +1,22 @@
 # Tomek
 
 ## buyorders
-- amount > 0
-- target_unit_price > 0
-- order_date
+- [x] amount > 0
+- [x] target_unit_price > 0
+- [x] order_date
 
 ## guilds
-- gold > 0
+- [x] gold >= 0
 
 ## heroes
-- gold > 0
-- exp > 0
-- hero_class w - warrior, a - archer, m - mage
+- [x] gold >= 0
+- [x] exp >= 0
+- [x] hero_class w - warrior, a - archer, m - mage
 
 ## items
-- only_treasure
-- price
-- min_lvl
+- [x] only_treasure
+- [x] price
+- [x] min_lvl
 
 # Piotrek
 
