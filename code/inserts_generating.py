@@ -2,7 +2,7 @@ from math import floor
 
 
 def item_gen(name, for_class, item_type_id, amount):
-    for i in range(0, amount):
+    for i in range(amount):
         print("call add_item(" + name + ",0,''," + for_class + ",0::SMALLINT," + str(
             item_type_id) + ",0,0,0,0,0,0,0,0,0,0,0);")
 

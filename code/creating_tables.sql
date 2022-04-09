@@ -206,7 +206,7 @@ create table buyorders
     order_date        timestamp not null
 );
 
-alter table buyorders
+alter table buy_orders
     owner to avnadmin;
 
 create table storage
@@ -252,7 +252,7 @@ create table auctioneditems
             references storage
 );
 
-alter table auctioneditems
+alter table auctioned_items
     owner to avnadmin;
 
 create table buynowitems
@@ -276,7 +276,7 @@ create table buynowitems
             references storage
 );
 
-alter table buynowitems
+alter table buy_now_items
     owner to avnadmin;
 
 create table trainers

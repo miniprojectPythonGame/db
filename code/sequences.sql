@@ -59,7 +59,7 @@ create sequence buyorders_buy_order_id_seq
 
 alter sequence buyorders_buy_order_id_seq owner to avnadmin;
 
-alter sequence buyorders_buy_order_id_seq owned by buyorders.buy_order_id;
+alter sequence buyorders_buy_order_id_seq owned by buy_orders.buy_order_id;
 
 create sequence storage_storage_id_seq
     as integer;
@@ -73,14 +73,14 @@ create sequence auctioneditems_auctioned_item_id_seq
 
 alter sequence auctioneditems_auctioned_item_id_seq owner to avnadmin;
 
-alter sequence auctioneditems_auctioned_item_id_seq owned by auctioneditems.auctioned_item_id;
+alter sequence auctioneditems_auctioned_item_id_seq owned by auctioned_items.auctioned_item_id;
 
 create sequence buynowitems_buy_now_item_id_seq
     as integer;
 
 alter sequence buynowitems_buy_now_item_id_seq owner to avnadmin;
 
-alter sequence buynowitems_buy_now_item_id_seq owned by buynowitems.buy_now_item_id;
+alter sequence buynowitems_buy_now_item_id_seq owned by buy_now_items.buy_now_item_id;
 
 create sequence trainers_trainer_id_seq
     as integer;
