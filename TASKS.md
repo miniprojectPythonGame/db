@@ -14,10 +14,10 @@
 - [ ] betowanie w licytacji
 
 # Jędrzej
-- [ ] refresh sklepików dla gracza przy jego pierwszym logowaniu danego dnia - trigger na pierwszy insert do logów 
-- [ ] dodanie tabeli logów uzytkowników
-- [ ] dodawanie do sprzedawanych
-- [ ] dodanie zlecenia kupna do buy_orders
+- [ - ] refresh sklepików dla gracza przy jego pierwszym logowaniu danego dnia - trigger na pierwszy insert do logów 
+- [ - ] dodanie tabeli logów uzytkowników
+- [ - ] dodawanie do sprzedawanych
+- [ - ] dodanie zlecenia kupna do buy_orders
 
 
 
