@@ -1,11 +1,11 @@
 # Tomek
-- [ ] filtry
-  - [ ] search po nazwie
-  - [ ] checkbox na item_type
-  - [ ] min price
-  - [ ] max price
-  - [ ] for_class - dla jakich klas
-- [ ] procedura kup teraz
+- [x] filtry
+  - [x] search po nazwie
+  - [x] checkbox na item_type
+  - [x] min price
+  - [x] max price
+  - [x] for_class - dla jakich klas
+- [x] procedura kup teraz
 
 
 # Piotrek
