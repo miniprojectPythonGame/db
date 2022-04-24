@@ -1,11 +1,11 @@
 # Tomek
-- [ ] filtry
-  - [ ] search po nazwie
-  - [ ] select na item_type
-  - [ ] min price
-  - [ ] max price
-  - [ ] select na for_class - dla jakich klas jest dany item (a, m, w or NULL)
-- [ ] procedura kup teraz
+- [x] filtry
+  - [x] search po nazwie
+  - [x] checkbox na item_type
+  - [x] min price
+  - [x] max price
+  - [x] for_class - dla jakich klas
+- [x] procedura kup teraz
 
 
 # Piotrek
@@ -14,10 +14,10 @@
 - [ ] betowanie w licytacji
 
 # Jędrzej
-- [ ] refresh sklepików dla gracza przy jego pierwszym logowaniu danego dnia - trigger na pierwszy insert do logów 
-- [ ] dodanie tabeli logów uzytkowników
-- [ ] dodawanie do sprzedawanych
-- [ ] dodanie zlecenia kupna do buy_orders
+- [x] refresh sklepików dla gracza przy jego pierwszym logowaniu danego dnia - trigger na pierwszy insert do logów 
+- [x] dodanie tabeli logów uzytkowników
+- [x] dodawanie do sprzedawanych
+- [x] dodanie zlecenia kupna do buy_orders
 
 
 
