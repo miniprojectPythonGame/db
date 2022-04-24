@@ -10,8 +10,8 @@
 
 # Piotrek
 - [ ] job (lub odpowiednik) na koniec licytacji
-- [ ] dodanie licytacji
-- [ ] betowanie w licytacji
+- [x] (?) dodanie licytacji
+- [x] betowanie w licytacji
 
 # Jędrzej
 - [x] refresh sklepików dla gracza przy jego pierwszym logowaniu danego dnia - trigger na pierwszy insert do logów 
