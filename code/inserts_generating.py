@@ -3,25 +3,25 @@ from math import floor
 
 def item_gen(name, for_class, item_type_id, amount):
     for i in range(amount):
-        print("call add_item(" + name + ",0,''," + for_class + ",0::SMALLINT," + str(
-            item_type_id) + ",0,0,0,0,0,0,0,0,0,0,0);")
+        print("call add_item(" + name + ",1,''," + for_class + ",0::SMALLINT," + str(
+            item_type_id) + ",1,0,0,0,0,0,0,0,0,0,0);")
 
 
 def all_item_types_gen():
     items = [
-        ("\"Belt\"", 0),
-        ("\"Boots\"", 1),
-        ("\"Breastplate\"", 2),
-        ("\"Gloves\"", 3),
-        ("\"Headgear\"", 4),
-        ("\"LuckyItem\"", 5),
-        ("\"Necklace\"", 6),
-        ("\"Ring\"", 7),
-        ("\"Steed\"", 8),
-        ("\"PrimaryWeapon\"", 9),
-        ("\"SecondaryWeapon\"", 10),
-        ("\"PotionPeriod\"", 11),
-        ("\"PotionPermanent\"", 12)
+        ("\'Belt\'", 0),
+        ("\'Boots\'", 1),
+        ("\'Breastplate\'", 2),
+        ("\'Gloves\'", 3),
+        ("\'Headgear\'", 4),
+        ("\'LuckyItem\'", 5),
+        ("\'Necklace\'", 6),
+        ("\'Ring\'", 7),
+        ("\'Steed\'", 8),
+        ("\'PrimaryWeapon\'", 9),
+        ("\'SecondaryWeapon\'", 10),
+        ("\'PotionPeriod\'", 11),
+        ("\'PotionPermanent\'", 12)
     ]
 
     for pair in items:

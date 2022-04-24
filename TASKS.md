@@ -1,10 +1,10 @@
 # Tomek
 - [ ] filtry
   - [ ] search po nazwie
-  - [ ] checkbox na item_type
+  - [ ] select na item_type
   - [ ] min price
   - [ ] max price
-  - [ ] for_class - dla jakich klas
+  - [ ] select na for_class - dla jakich klas jest dany item (a, m, w or NULL)
 - [ ] procedura kup teraz
 
 
