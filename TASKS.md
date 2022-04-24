@@ -9,7 +9,7 @@
 
 
 # Piotrek
-- [ ] job (lub odpowiednik) na koniec licytacji
+- [x] job (lub odpowiednik) na koniec licytacji
 - [x] (?) dodanie licytacji
 - [x] betowanie w licytacji
 
