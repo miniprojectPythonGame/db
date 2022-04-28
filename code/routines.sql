@@ -78,29 +78,6 @@ $$;
 
 alter function remove_all_heroes() owner to avnadmin;
 
-create function add_hero(name_ character varying, player_id_ character varying, hero_class_ character, strength_ integer, intelligence_ integer, dexterity_ integer, constitution_ integer, luck_ integer, persuasion_ integer, trade_ integer, leadership_ integer, protection_ integer, initiative_ integer) returns integer
-    language plpgsql
-as
-$$
-declare
-    statistic_id_ int;
-    hero_id_ int;
-    exp_next_lvl int;
-begin
-    statistic_id_ := add_statistics(strength_, intelligence_, dexterity_, constitution_, luck_, persuasion_, trade_,
-                                    leadership_, protection_, initiative_);
-    select exp into exp_next_lvl from levels where level_id = 2;
-
-    insert into heroes (name, player_id, gold, level_id, exp, hero_class, statistics_id, guild_id,free_development_pts,exp_next_lvl)
-    VALUES (name_, player_id_, 0, 1, 100, hero_class_, statistic_id_, NULL,4,exp_next_lvl) returning hero_id into hero_id_;
-
-    call add_empty_storage(hero_id_,30);
-    return hero_id_;
-end;
-$$;
-
-alter function add_hero(varchar, varchar, char, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
-
 create procedure use_dev_pts(IN hero_id_ integer)
     language plpgsql
 as
@@ -676,4 +653,87 @@ END;
 $$;
 
 alter procedure add_new_item_on_sale(integer, integer, integer, integer, integer, varchar, timestamp) owner to avnadmin;
+
+create function add_hero(avatar_id_ integer, name_ character varying, player_id_ character varying, hero_class_ character, strength_ integer, intelligence_ integer, dexterity_ integer, constitution_ integer, luck_ integer, persuasion_ integer, trade_ integer, leadership_ integer, protection_ integer, initiative_ integer) returns integer
+    language plpgsql
+as
+$$
+declare
+    statistic_id_ int;
+    hero_id_ int;
+    exp_next_lvl int;
+begin
+    statistic_id_ := add_statistics(strength_, intelligence_, dexterity_, constitution_, luck_, persuasion_, trade_,
+                                    leadership_, protection_, initiative_);
+    select exp into exp_next_lvl from levels where level_id = 2;
+
+    insert into heroes (avatar_id,name, player_id, gold, level_id, exp, hero_class, statistics_id, guild_id,free_development_pts,exp_next_lvl)
+    VALUES (avatar_id_,name_, player_id_, 0, 1, 100, hero_class_, statistic_id_, NULL,4,exp_next_lvl) returning hero_id into hero_id_;
+
+    call add_empty_storage(hero_id_,30);
+    return hero_id_;
+end;
+$$;
+
+alter function add_hero(integer, varchar, varchar, char, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
+
+create function filter_items(item_name character varying, item_types integer[], min_price integer, max_price integer, item_class character[])
+    returns TABLE(item_id integer)
+    language plpgsql
+as
+$$
+begin
+    select item_id
+    from items
+    where items.name ~* item_name
+      and items.item_type_id = any (item_types)
+      and min_price <= items.price
+      and items.price <= max_price
+      and items.for_class = any (item_class);
+end;
+$$;
+
+alter function filter_items(varchar, integer[], integer, integer, character[]) owner to avnadmin;
+
+create procedure buy_now(IN proc_buyer_id integer, IN proc_buy_now_item_id integer)
+    language plpgsql
+as
+$$
+declare
+    var_item_id           integer;
+    item_price            integer;
+    item_amount           integer;
+    buyer_gold            integer;
+    var_seller_id         integer;
+    var_seller_storage_id integer;
+begin
+    select item_id, seller_id, selling_price, amount, storage_id
+    from buy_now_items
+    where buy_now_items.buy_now_item_id = proc_buy_now_item_id
+    into var_item_id, var_seller_id, item_price, item_amount, var_seller_storage_id;
+    select gold from heroes where heroes.hero_id = proc_buyer_id into buyer_gold;
+    -- check if the hero has enough money
+    if item_price > buyer_gold then
+        raise exception 'You do not have enough gold to purchase this item';
+    end if;
+
+    -- delete the item from the seller
+    call remove_from_storage(var_seller_id, var_seller_storage_id);
+
+    -- pay for the item
+    update heroes
+    set gold = gold - item_price
+    where hero_id = proc_buyer_id;
+
+    -- give money to the seller
+    update heroes
+    set gold = gold + item_price
+    where hero_id = var_seller_id;
+
+    -- add to the buyer's storage
+    call add_to_storage(proc_buyer_id, proc_buy_now_item_id, item_amount);
+end;
+$$;
+
+alter procedure buy_now(integer, integer) owner to avnadmin;
 
