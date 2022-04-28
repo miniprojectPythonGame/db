@@ -184,3 +184,10 @@ alter sequence stable_shop_id_seq owner to avnadmin;
 
 alter sequence stable_shop_id_seq owned by steed_shop.id;
 
+create sequence messages_message_id_seq
+    as integer;
+
+alter sequence messages_message_id_seq owner to avnadmin;
+
+alter sequence messages_message_id_seq owned by messages.message_id;
+

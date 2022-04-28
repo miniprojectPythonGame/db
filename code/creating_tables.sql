@@ -134,7 +134,9 @@ alter table bots
 create table heroes
 (
     name                 varchar(50) not null,
-    player_id            varchar(50) not null,
+    player_id            varchar(50) not null
+        constraint heroes_players_player_id_fk
+            references players,
     hero_id              serial
         constraint heroes_pk
             primary key,
@@ -202,24 +204,24 @@ create trigger item_del_trig
     for each row
 execute procedure remove_statistics();
 
-create table buyorders
+create table buy_orders
 (
-    buy_order_id      serial
+    buy_order_id      integer default nextval('buyorders_buy_order_id_seq'::regclass) not null
         constraint buyorders_pk
             primary key,
-    buyer_id          integer   not null
+    buyer_id          integer                                                         not null
         constraint heroes_buyorders
             references heroes,
-    amount            integer   not null
+    amount            integer                                                         not null
         constraint buyorders_amount_check
             check (amount > 0),
-    item_id           integer   not null
+    item_id           integer                                                         not null
         constraint buyorders_items
             references items,
-    target_unit_price integer   not null
+    target_unit_price integer                                                         not null
         constraint buyorders_target_unit_price_check
             check (target_unit_price > 0),
-    order_date        timestamp not null
+    order_date        timestamp                                                       not null
         constraint buyorders_order_date
             check (order_date <= CURRENT_DATE)
 );
@@ -246,50 +248,48 @@ create table storage
 alter table storage
     owner to avnadmin;
 
-create unique index storage_item_slot_id_uindex
-    on storage (item_slot_id);
-
-create table auctioneditems
+create table auctioned_items
 (
-    auctioned_item_id  serial
+    auctioned_item_id  integer default nextval('auctioneditems_auctioned_item_id_seq'::regclass) not null
         constraint auctioneditems_pk
             primary key,
-    item_id            integer   not null,
-    current_price      integer   not null
+    item_id            integer                                                                   not null,
+    current_price      integer                                                                   not null
         constraint positive_curr_price
             check (current_price > 0),
-    amount             integer   not null,
-    start_price        integer   not null
+    amount             integer                                                                   not null,
+    start_price        integer                                                                   not null
         constraint positive_start_price
             check (start_price > 0),
-    seller_id          integer   not null,
-    auction_end_date   timestamp not null,
-    auction_start_date timestamp not null,
-    storage_id         integer   not null
+    seller_id          integer                                                                   not null,
+    auction_end_date   timestamp                                                                 not null,
+    auction_start_date timestamp                                                                 not null,
+    storage_id         integer                                                                   not null
         constraint auctioneditems_storage
-            references storage
+            references storage,
+    current_leader_id  integer
 );
 
 alter table auctioned_items
     owner to avnadmin;
 
-create table buynowitems
+create table buy_now_items
 (
-    buy_now_item_id serial
+    buy_now_item_id integer default nextval('buynowitems_buy_now_item_id_seq'::regclass) not null
         constraint buynowitems_pk
             primary key,
-    item_id         integer   not null,
-    selling_price   integer   not null
+    item_id         integer                                                              not null,
+    selling_price   integer                                                              not null
         constraint positive_selling_price
             check (selling_price > 0),
-    amount          integer   not null
+    amount          integer                                                              not null
         constraint positive_amount
             check (amount > 0),
-    seller_id       integer   not null,
-    post_date       timestamp not null
+    seller_id       integer                                                              not null,
+    post_date       timestamp                                                            not null
         constraint post_date
             check (post_date <= CURRENT_DATE),
-    storage_id      integer   not null
+    storage_id      integer                                                              not null
         constraint storage_buynowitems
             references storage
 );
@@ -330,7 +330,10 @@ alter table maps
 create table armour_shop
 (
     item_id      integer,
-    hero_id      integer not null,
+    hero_id      integer not null
+        constraint armour_shop_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
     id           serial
         constraint armour_shop_pk
             primary key,
@@ -349,7 +352,10 @@ create table magic_shop
         constraint magic_shop_pk
             primary key,
     item_id      integer,
-    hero_id      integer not null,
+    hero_id      integer not null
+        constraint magic_shop_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
     item_slot_id integer not null
 );
 
@@ -364,7 +370,10 @@ create table weapon_shop
     id           serial
         constraint weapon_shop_pk
             primary key,
-    hero_id      integer not null,
+    hero_id      integer not null
+        constraint weapon_shop_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
     item_id      integer,
     item_slot_id integer not null
 );
@@ -380,7 +389,10 @@ create table steed_shop
     id           integer default nextval('stable_shop_id_seq'::regclass) not null
         constraint stable_shop_pk
             primary key,
-    hero_id      integer                                                 not null,
+    hero_id      integer                                                 not null
+        constraint steed_shop_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
     item_id      integer,
     item_slot_id integer                                                 not null
 );
@@ -390,3 +402,52 @@ alter table steed_shop
 
 create unique index stable_shop_id_uindex
     on steed_shop (id);
+
+create table messages
+(
+    message_id        serial
+        constraint messages_pk
+            primary key,
+    hero_id           integer       not null
+        constraint messages_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
+    date_of_receiving timestamp     not null,
+    title             varchar(128)  not null,
+    description       varchar(1000) not null
+);
+
+alter table messages
+    owner to avnadmin;
+
+create unique index messages_message_id_uindex
+    on messages (message_id);
+
+create table logs
+(
+    log_id     integer     not null
+        primary key,
+    player_id  varchar(50) not null
+        references players,
+    hero_id    integer     not null
+        references heroes,
+    login_time timestamp   not null
+);
+
+alter table logs
+    owner to avnadmin;
+
+create trigger refresh_all_shops_trg
+    before insert
+    on logs
+    for each row
+execute procedure trigger_refresh_all_shops();
+
+create table smallest_item_slot_id
+(
+    item_slot_id integer
+);
+
+alter table smallest_item_slot_id
+    owner to avnadmin;
+
