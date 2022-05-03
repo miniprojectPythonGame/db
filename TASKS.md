@@ -30,11 +30,11 @@
 - [x] dodanie tabeli logów uzytkowników
 - [x] dodawanie do sprzedawanych
 - [x] dodanie zlecenia kupna do buy_orders
-- [ ] widok - wyświetlanie dla każdego gracza jego sprzedawanych
-- [ ] tabela zawierająca informacje o zablokowanych użytkownikach blocked_users(player_id,block_start,block_end,reason)
-- [ ] trigger check_if_needs_block() - trigger na insert do logów, jeśli były 3 nieudane próby dodaje blocka do tabeli
+- [x] widok - wyświetlanie dla każdego gracza jego sprzedawanych
+- [x] tabela zawierająca informacje o zablokowanych użytkownikach blocked_users(player_id,block_start,block_end,reason)
+- [x] trigger check_if_needs_block() - trigger na insert do logów, jeśli były 3 nieudane próby dodaje blocka do tabeli
   blocked_users()
-- [ ] add_log(player_id,login_status) dodawanie logów udanych bądź nieudanych
+- [x] add_log(player_id,login_status) dodawanie logów udanych bądź nieudanych
 
 # New tasks:
 - None
