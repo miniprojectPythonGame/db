@@ -37,6 +37,7 @@
 - [x] add_log(player_id,login_status) dodawanie logów udanych bądź nieudanych
 
 # New tasks:
-- None
+- [ ] quality produktu przyjmuje tylko wartości 1,2,3 i trzeba to sprawdzać
+- [ ] przetestować add_item (były zmiany w tabeli item - dodano quality)
 
 
