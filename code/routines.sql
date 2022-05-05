@@ -136,23 +136,6 @@ $$;
 
 alter procedure add_empty_storage(integer, integer) owner to avnadmin;
 
-create procedure add_item(IN name_ character varying, IN price_ integer, IN description_ character varying, IN for_class_ character, IN only_treasure_ smallint, IN item_type_id_ integer, IN min_lvl_ integer, IN strength_ integer, IN intelligence_ integer, IN dexterity_ integer, IN constitution_ integer, IN luck_ integer, IN persuasion_ integer, IN trade_ integer, IN leadership_ integer, IN protection_ integer, IN initiative_ integer)
-    language plpgsql
-as
-$$
-declare
-    statistic_id_ int;
-begin
-    statistic_id_ := add_statistics(strength_, intelligence_, dexterity_, constitution_, luck_, persuasion_, trade_,
-                                    leadership_, protection_, initiative_);
-
-    insert into items (name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class)
-    values (name_, price_, description_, only_treasure_, statistic_id_, item_type_id_, min_lvl_,for_class_);
-end;
-$$;
-
-alter procedure add_item(varchar, integer, varchar, char, smallint, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
-
 create procedure add_to_storage(IN hero_id_ integer, IN item_id_ integer, IN amount_ integer)
     language plpgsql
 as
@@ -500,7 +483,7 @@ BEGIN
         INSERT INTO buy_orders (buyer_id, amount, item_id, target_unit_price, order_date)
         VALUES (proc_buyer_id,proc_amount,proc_item_id,proc_target_unit_price, CURRENT_DATE);
     ELSE
-        RAISE NOTICE 'New buy now order cannot be created';
+        RAISE EXCEPTION 'New buy now order cannot be created';
         END IF;
 END;
 $$;
@@ -736,4 +719,68 @@ end;
 $$;
 
 alter procedure buy_now(integer, integer) owner to avnadmin;
+
+create procedure add_log(IN player_id_ character varying, IN login_status boolean)
+    language plpgsql
+as
+$$
+DECLARE
+    player_exists integer;
+BEGIN
+    SELECT Count(*) FROM players WHERE player_id = player_id_  GROUP BY  player_id INTO player_exists;
+
+    IF player_exists = 1 THEN
+        INSERT INTO logs (player_id, login_time, successful)
+        VALUES (player_id_,CURRENT_DATE, login_status);
+    ELSE
+        RAISE EXCEPTION 'Such player doesnt exist';
+    END IF;
+
+    COMMIT;
+END
+$$;
+
+alter procedure add_log(varchar, boolean) owner to avnadmin;
+
+create function trigger_block_user() returns trigger
+    language plpgsql
+as
+$$
+DECLARE
+        first_attempt timestamp;
+        second_attempt timestamp;
+    BEGIN
+        IF NEW.successful = true THEN
+            RAISE EXCEPTION 'The login was successful';
+        END IF;
+
+       SELECT login_time FROM logs WHERE player_id = NEW.player_id AND successful = false
+       ORDER BY login_time DESC LIMIT 2 INTO second_attempt, first_attempt;
+
+        IF (date_part('day',NEW.login_time - first_attempt)*24 + date_part('hour',NEW.login_time - first_attempt)) <= 0 THEN
+            --assumming that these unsuccessful attempts must be within 1 hour (0 because this expression returns number of full passed hours, i.e. 45 min diff will return 0 and 1h 1min diff will return 1
+            INSERT INTO blocked_users( player_id, block_start, block_end, reason)
+            VALUES (NEW.player_id, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 day', 'Too many unsuccessful login attempts'); --blocking for 1 day, starting on last unsuccessful attempt
+        END IF;
+    END
+$$;
+
+alter function trigger_block_user() owner to avnadmin;
+
+create procedure add_item(IN quality_ integer, IN name_ character varying, IN price_ integer, IN description_ character varying, IN for_class_ character, IN only_treasure_ smallint, IN item_type_id_ integer, IN min_lvl_ integer, IN strength_ integer, IN intelligence_ integer, IN dexterity_ integer, IN constitution_ integer, IN luck_ integer, IN persuasion_ integer, IN trade_ integer, IN leadership_ integer, IN protection_ integer, IN initiative_ integer)
+    language plpgsql
+as
+$$
+declare
+    statistic_id_ int;
+begin
+    statistic_id_ := add_statistics(strength_, intelligence_, dexterity_, constitution_, luck_, persuasion_, trade_,
+                                    leadership_, protection_, initiative_);
+
+    insert into items (name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class, owner_id, quality)
+    values (name_, price_, description_, only_treasure_, statistic_id_, item_type_id_, min_lvl_,for_class_,quality_);
+end;
+$$;
+
+alter procedure add_item(integer, varchar, integer, varchar, char, smallint, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
 

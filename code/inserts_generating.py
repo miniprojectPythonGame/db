@@ -1,9 +1,9 @@
 from math import floor
 
 
-def item_gen(name, for_class, item_type_id, amount):
+def item_gen(name, for_class, item_type_id, amount,quality):
     for i in range(amount):
-        print("call add_item(" + name + ",1,''," + for_class + ",0::SMALLINT," + str(
+        print("call add_item("+str(quality)+"," + name + ",1,''," + for_class + ",0::SMALLINT," + str(
             item_type_id) + ",1,0,0,0,0,0,0,0,0,0,0);")
 
 
@@ -25,7 +25,7 @@ def all_item_types_gen():
     ]
 
     for pair in items:
-        item_gen(pair[0],"NULL",pair[1],10)
+        item_gen(pair[0],"NULL",pair[1],10,3)
 
 
 def lvl_gen():

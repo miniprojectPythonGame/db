@@ -60,11 +60,11 @@ INSERT INTO public.statistics (statistics_id, strength, intelligence, dexterity,
 INSERT INTO public.statistics (statistics_id, strength, intelligence, dexterity, constitution, luck, persuasion, trade, leadership, protection, initiative) VALUES (31, 5, 0, 0, 0, 5, 0, 0, 0, 30, 0);
 INSERT INTO public.statistics (statistics_id, strength, intelligence, dexterity, constitution, luck, persuasion, trade, leadership, protection, initiative) VALUES (33, 0, 0, 10, 0, 5, 0, 0, 0, 0, 0);
 
-INSERT INTO public.heroes (name, player_id, hero_id, gold, level_id, exp, hero_class, statistics_id, guild_id, free_development_pts, exp_next_lvl) VALUES ('testx', '3DYC5w8HwpchalTfSYmAtOWLWO33', 20, 0, 1, 100, 'w', 26, null, 4, 220);
-INSERT INTO public.heroes (name, player_id, hero_id, gold, level_id, exp, hero_class, statistics_id, guild_id, free_development_pts, exp_next_lvl) VALUES ('test5', '3DYC5w8HwpchalTfSYmAtOWLWO33', 19, 0, 4, 1754, 'w', 25, null, 16, 3036);
+INSERT INTO public.heroes (name, player_id, hero_id, gold, level_id, exp, hero_class, statistics_id, guild_id, free_development_pts, exp_next_lvl,avatar_id) VALUES ('testx', '3DYC5w8HwpchalTfSYmAtOWLWO33', 20, 0, 1, 100, 'w', 26, null, 4, 220,1);
+INSERT INTO public.heroes (name, player_id, hero_id, gold, level_id, exp, hero_class, statistics_id, guild_id, free_development_pts, exp_next_lvl,avatar_id) VALUES ('test5', '3DYC5w8HwpchalTfSYmAtOWLWO33', 19, 0, 4, 1754, 'w', 25, null, 16, 3036,1);
 
-INSERT INTO public.items (item_id, name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class) VALUES (7, 'simple breastplate', 7, 'Nothing to fancy', 0, 31, 2, 1, null);
-INSERT INTO public.items (item_id, name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class) VALUES (9, 'simple bow', 5, 'Just a regular bow', 0, 33, 9, 1, 'a');
+INSERT INTO public.items (item_id, name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class,quality) VALUES (7, 'simple breastplate', 7, 'Nothing to fancy', 0, 31, 2, 1, null,1);
+INSERT INTO public.items (item_id, name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class,quality) VALUES (9, 'simple bow', 5, 'Just a regular bow', 0, 33, 9, 1, 'a',1);
 
 INSERT INTO public.storage (item_slot_id, item_id, amount, available, hero_id, storage_id) VALUES (1, null, 0, 0, 20, 4);
 INSERT INTO public.storage (item_slot_id, item_id, amount, available, hero_id, storage_id) VALUES (3, null, 0, 0, 20, 6);

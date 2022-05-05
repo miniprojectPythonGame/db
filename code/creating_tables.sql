@@ -159,7 +159,8 @@ create table heroes
         constraint guild_heroes
             references guilds,
     free_development_pts integer     not null,
-    exp_next_lvl         integer     not null
+    exp_next_lvl         integer     not null,
+    avatar_id            integer     not null
 );
 
 alter table heroes
@@ -192,7 +193,8 @@ create table items
         constraint items_min_lvl_check
             check (min_lvl > 0),
     for_class     char,
-    owner_id      integer
+    owner_id      integer,
+    quality       integer      not null
 );
 
 alter table items
@@ -429,9 +431,8 @@ create table logs
         primary key,
     player_id  varchar(50) not null
         references players,
-    hero_id    integer     not null
-        references heroes,
-    login_time timestamp   not null
+    login_time timestamp   not null,
+    successful boolean     not null
 );
 
 alter table logs
@@ -443,11 +444,33 @@ create trigger refresh_all_shops_trg
     for each row
 execute procedure trigger_refresh_all_shops();
 
+create trigger block_user_after_3_unsuccessful_attepts_trg
+    after insert
+    on logs
+    for each row
+execute procedure trigger_block_user();
+
 create table smallest_item_slot_id
 (
     item_slot_id integer
 );
 
 alter table smallest_item_slot_id
+    owner to avnadmin;
+
+create table blocked_users
+(
+    block_id    integer     not null
+        primary key,
+    player_id   varchar(50) not null
+        references players,
+    block_start timestamp   not null,
+    block_end   timestamp   not null,
+    reason      varchar(50) not null,
+    constraint blocked_users_check
+        check (block_end > block_start)
+);
+
+alter table blocked_users
     owner to avnadmin;
 
