@@ -7,12 +7,12 @@
     - [x] max price
     - [x] for_class - dla jakich klas
 - [x] procedura kup teraz
-- [ ] trigger na insert do buy_now_items sprawdzający:
-- [ ] walidacja (?)
-- [ ] przekazanie itemów
-- [ ] usunąć zlecenie kupna
-- [ ] usunąć wystawiony item z buy_now_items
-- [ ] wybieranie kupca na podstawie daty wystawienia zlecenia kupna (NIE na podstawie najwyższej kwoty zlecenia
+- [x] trigger na insert do buy_now_items sprawdzający:
+- [x] walidacja (?)
+- [x] przekazanie itemów
+- [x] usunąć zlecenie kupna
+- [x] usunąć wystawiony item z buy_now_items
+- [x] wybieranie kupca na podstawie daty wystawienia zlecenia kupna (NIE na podstawie najwyższej kwoty zlecenia
       kupna)
 
 # Piotrek
