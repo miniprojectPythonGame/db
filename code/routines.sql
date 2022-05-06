@@ -41,7 +41,7 @@ $$;
 
 alter function add_statistics(integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
 
-create function remove_statistics() returns trigger
+create function remove_statistics(hero_id_ integer) returns trigger
     language plpgsql
 as
 $$
@@ -52,7 +52,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_statistics() owner to avnadmin;
+alter function remove_statistics(integer) owner to avnadmin;
 
 create procedure remove_hero(IN hero_id_ integer)
     language plpgsql
@@ -66,7 +66,7 @@ $$;
 
 alter procedure remove_hero(integer) owner to avnadmin;
 
-create function remove_all_heroes() returns trigger
+create function remove_all_heroes(hero_id_ integer, item_id_ integer) returns trigger
     language plpgsql
 as
 $$
@@ -76,7 +76,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_all_heroes() owner to avnadmin;
+alter function remove_all_heroes(integer, integer) owner to avnadmin;
 
 create procedure use_dev_pts(IN hero_id_ integer)
     language plpgsql
@@ -89,7 +89,7 @@ begin
 end;
 $$;
 
-alter procedure use_dev_pts(integer) owner to avnadmin;
+alter procedure use_dev_pts(integer, integer) owner to avnadmin;
 
 create procedure add_exp(IN hero_id_ integer, IN exp_to_add integer)
     language plpgsql
@@ -230,18 +230,6 @@ end;
 $$;
 
 alter procedure add_empty_shops_for_hero(integer) owner to avnadmin;
-
-create function system_rows(internal) returns tsm_handler
-    strict
-    language c
-as
-$$
-begin
--- missing source code
-end;
-$$;
-
-alter function system_rows(internal) owner to postgres;
 
 create procedure refresh_armour_shop_for_hero(IN hero_id_ integer)
     language plpgsql
@@ -778,9 +766,34 @@ begin
                                     leadership_, protection_, initiative_);
 
     insert into items (name, price, description, only_treasure, statistics_id, item_type_id, min_lvl, for_class, owner_id, quality)
-    values (name_, price_, description_, only_treasure_, statistic_id_, item_type_id_, min_lvl_,for_class_,quality_);
+    values (name_, price_, description_, only_treasure_, statistic_id_, item_type_id_, min_lvl_,for_class_,NULL,quality_);
 end;
 $$;
 
 alter procedure add_item(integer, varchar, integer, varchar, char, smallint, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
+
+create function check_buy_orders() returns trigger
+    language plpgsql
+as
+$$
+declare
+    buyer_id_     int;
+    buy_order_id_ int;
+begin
+    select buyer_id, buy_order_id
+    into buyer_id_, buy_order_id_
+    from buy_orders
+    where item_id = NEW.item_id
+      and target_unit_price <= NEW.selling_price
+    order by order_date
+    limit 1;
+
+    if buyer_id_ is not null then
+        call buy_now(buyer_id_, NEW.item_id);
+        delete from buy_orders where buy_order_id = buy_order_id_;
+    end if;
+end
+$$;
+
+alter function check_buy_orders() owner to avnadmin;
 
