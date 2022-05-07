@@ -206,38 +206,12 @@ create trigger item_del_trig
     for each row
 execute procedure remove_statistics();
 
-create table buy_orders
-(
-    buy_order_id      integer default nextval('buyorders_buy_order_id_seq'::regclass) not null
-        constraint buyorders_pk
-            primary key,
-    buyer_id          integer                                                         not null
-        constraint heroes_buyorders
-            references heroes,
-    amount            integer                                                         not null
-        constraint buyorders_amount_check
-            check (amount > 0),
-    item_id           integer                                                         not null
-        constraint buyorders_items
-            references items,
-    target_unit_price integer                                                         not null
-        constraint buyorders_target_unit_price_check
-            check (target_unit_price > 0),
-    order_date        timestamp                                                       not null
-        constraint buyorders_order_date
-            check (order_date <= CURRENT_DATE)
-);
-
-alter table buy_orders
-    owner to avnadmin;
-
 create table storage
 (
     item_slot_id integer,
     item_id      integer
         constraint storage_items
             references items,
-    amount       integer  not null,
     available    smallint not null,
     hero_id      integer  not null
         constraint heroes_storage
@@ -248,55 +222,6 @@ create table storage
 );
 
 alter table storage
-    owner to avnadmin;
-
-create table auctioned_items
-(
-    auctioned_item_id  integer default nextval('auctioneditems_auctioned_item_id_seq'::regclass) not null
-        constraint auctioneditems_pk
-            primary key,
-    item_id            integer                                                                   not null,
-    current_price      integer                                                                   not null
-        constraint positive_curr_price
-            check (current_price > 0),
-    amount             integer                                                                   not null,
-    start_price        integer                                                                   not null
-        constraint positive_start_price
-            check (start_price > 0),
-    seller_id          integer                                                                   not null,
-    auction_end_date   timestamp                                                                 not null,
-    auction_start_date timestamp                                                                 not null,
-    storage_id         integer                                                                   not null
-        constraint auctioneditems_storage
-            references storage,
-    current_leader_id  integer
-);
-
-alter table auctioned_items
-    owner to avnadmin;
-
-create table buy_now_items
-(
-    buy_now_item_id integer default nextval('buynowitems_buy_now_item_id_seq'::regclass) not null
-        constraint buynowitems_pk
-            primary key,
-    item_id         integer                                                              not null,
-    selling_price   integer                                                              not null
-        constraint positive_selling_price
-            check (selling_price > 0),
-    amount          integer                                                              not null
-        constraint positive_amount
-            check (amount > 0),
-    seller_id       integer                                                              not null,
-    post_date       timestamp                                                            not null
-        constraint post_date
-            check (post_date <= CURRENT_DATE),
-    storage_id      integer                                                              not null
-        constraint storage_buynowitems
-            references storage
-);
-
-alter table buy_now_items
     owner to avnadmin;
 
 create table trainers
@@ -386,25 +311,6 @@ alter table weapon_shop
 create unique index weapon_shop_id_uindex
     on weapon_shop (id);
 
-create table steed_shop
-(
-    id           integer default nextval('stable_shop_id_seq'::regclass) not null
-        constraint stable_shop_pk
-            primary key,
-    hero_id      integer                                                 not null
-        constraint steed_shop_heroes_hero_id_fk
-            references heroes
-            on update cascade on delete cascade,
-    item_id      integer,
-    item_slot_id integer                                                 not null
-);
-
-alter table steed_shop
-    owner to avnadmin;
-
-create unique index stable_shop_id_uindex
-    on steed_shop (id);
-
 create table messages
 (
     message_id        serial
@@ -450,14 +356,6 @@ create trigger block_user_after_3_unsuccessful_attepts_trg
     for each row
 execute procedure trigger_block_user();
 
-create table smallest_item_slot_id
-(
-    item_slot_id integer
-);
-
-alter table smallest_item_slot_id
-    owner to avnadmin;
-
 create table blocked_users
 (
     block_id    integer     not null
@@ -473,4 +371,94 @@ create table blocked_users
 
 alter table blocked_users
     owner to avnadmin;
+
+create table buy_orders
+(
+    buy_order_id      integer default nextval('buyorders_buy_order_id_seq'::regclass) not null
+        constraint buyorders_pk
+            primary key,
+    buyer_id          integer                                                         not null
+        constraint heroes_buyorders
+            references heroes,
+    item_id           integer                                                         not null
+        constraint buyorders_items
+            references items,
+    target_unit_price integer                                                         not null
+        constraint buyorders_target_unit_price_check
+            check (target_unit_price > 0),
+    order_date        timestamp                                                       not null
+        constraint buyorders_order_date
+            check (order_date <= CURRENT_DATE)
+);
+
+alter table buy_orders
+    owner to avnadmin;
+
+create table auctioned_items
+(
+    auctioned_item_id  integer default nextval('auctioneditems_auctioned_item_id_seq'::regclass) not null
+        constraint auctioneditems_pk
+            primary key,
+    item_id            integer                                                                   not null,
+    current_price      integer                                                                   not null
+        constraint positive_curr_price
+            check (current_price > 0),
+    start_price        integer                                                                   not null
+        constraint positive_start_price
+            check (start_price > 0),
+    seller_id          integer                                                                   not null,
+    auction_end_date   timestamp                                                                 not null,
+    auction_start_date timestamp                                                                 not null,
+    storage_id         integer                                                                   not null
+        constraint auctioneditems_storage
+            references storage,
+    current_leader_id  integer
+);
+
+alter table auctioned_items
+    owner to avnadmin;
+
+create table buy_now_items
+(
+    buy_now_item_id integer default nextval('buynowitems_buy_now_item_id_seq'::regclass) not null
+        constraint buynowitems_pk
+            primary key,
+    item_id         integer                                                              not null,
+    selling_price   integer                                                              not null
+        constraint positive_selling_price
+            check (selling_price > 0),
+    seller_id       integer                                                              not null,
+    post_date       timestamp                                                            not null,
+    storage_id      integer                                                              not null
+        constraint storage_buynowitems
+            references storage
+);
+
+alter table buy_now_items
+    owner to avnadmin;
+
+create trigger trigger_check_buy_orders
+    after insert
+    on buy_now_items
+    for each row
+execute procedure check_buy_orders();
+
+create table steed_shop
+(
+    id           integer default nextval('stable_shop_id_seq'::regclass) not null
+        constraint stable_shop_pk
+            primary key,
+    hero_id      integer                                                 not null
+        constraint steed_shop_heroes_hero_id_fk
+            references heroes
+            on update cascade on delete cascade,
+    item_id      integer,
+    item_slot_id integer                                                 not null
+);
+
+alter table steed_shop
+    owner to avnadmin;
+
+create unique index stable_shop_id_uindex
+    on steed_shop (id);
 

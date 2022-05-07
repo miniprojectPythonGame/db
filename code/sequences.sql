@@ -54,33 +54,12 @@ alter sequence items_item_id_seq owner to avnadmin;
 
 alter sequence items_item_id_seq owned by items.item_id;
 
-create sequence buyorders_buy_order_id_seq
-    as integer;
-
-alter sequence buyorders_buy_order_id_seq owner to avnadmin;
-
-alter sequence buyorders_buy_order_id_seq owned by buy_orders.buy_order_id;
-
 create sequence storage_storage_id_seq
     as integer;
 
 alter sequence storage_storage_id_seq owner to avnadmin;
 
 alter sequence storage_storage_id_seq owned by storage.storage_id;
-
-create sequence auctioneditems_auctioned_item_id_seq
-    as integer;
-
-alter sequence auctioneditems_auctioned_item_id_seq owner to avnadmin;
-
-alter sequence auctioneditems_auctioned_item_id_seq owned by auctioned_items.auctioned_item_id;
-
-create sequence buynowitems_buy_now_item_id_seq
-    as integer;
-
-alter sequence buynowitems_buy_now_item_id_seq owner to avnadmin;
-
-alter sequence buynowitems_buy_now_item_id_seq owned by buy_now_items.buy_now_item_id;
 
 create sequence trainers_trainer_id_seq
     as integer;
@@ -95,6 +74,55 @@ create sequence maps_map_id_seq
 alter sequence maps_map_id_seq owner to avnadmin;
 
 alter sequence maps_map_id_seq owned by maps.map_id;
+
+create sequence armour_shop_id_seq
+    as integer;
+
+alter sequence armour_shop_id_seq owner to avnadmin;
+
+alter sequence armour_shop_id_seq owned by armour_shop.id;
+
+create sequence magic_shop_id_seq
+    as integer;
+
+alter sequence magic_shop_id_seq owner to avnadmin;
+
+alter sequence magic_shop_id_seq owned by magic_shop.id;
+
+create sequence weapon_shop_id_seq
+    as integer;
+
+alter sequence weapon_shop_id_seq owner to avnadmin;
+
+alter sequence weapon_shop_id_seq owned by weapon_shop.id;
+
+create sequence messages_message_id_seq
+    as integer;
+
+alter sequence messages_message_id_seq owner to avnadmin;
+
+alter sequence messages_message_id_seq owned by messages.message_id;
+
+create sequence buyorders_buy_order_id_seq
+    as integer;
+
+alter sequence buyorders_buy_order_id_seq owner to avnadmin;
+
+alter sequence buyorders_buy_order_id_seq owned by buy_orders.buy_order_id;
+
+create sequence auctioneditems_auctioned_item_id_seq
+    as integer;
+
+alter sequence auctioneditems_auctioned_item_id_seq owner to avnadmin;
+
+alter sequence auctioneditems_auctioned_item_id_seq owned by auctioned_items.auctioned_item_id;
+
+create sequence buynowitems_buy_now_item_id_seq
+    as integer;
+
+alter sequence buynowitems_buy_now_item_id_seq owner to avnadmin;
+
+alter sequence buynowitems_buy_now_item_id_seq owned by buy_now_items.buy_now_item_id;
 
 create sequence auctioneditems_seq;
 
@@ -156,38 +184,10 @@ create sequence trainers_seq;
 
 alter sequence trainers_seq owner to avnadmin;
 
-create sequence armour_shop_id_seq
-    as integer;
-
-alter sequence armour_shop_id_seq owner to avnadmin;
-
-alter sequence armour_shop_id_seq owned by armour_shop.id;
-
-create sequence magic_shop_id_seq
-    as integer;
-
-alter sequence magic_shop_id_seq owner to avnadmin;
-
-alter sequence magic_shop_id_seq owned by magic_shop.id;
-
-create sequence weapon_shop_id_seq
-    as integer;
-
-alter sequence weapon_shop_id_seq owner to avnadmin;
-
-alter sequence weapon_shop_id_seq owned by weapon_shop.id;
-
 create sequence stable_shop_id_seq
     as integer;
 
 alter sequence stable_shop_id_seq owner to avnadmin;
 
 alter sequence stable_shop_id_seq owned by steed_shop.id;
-
-create sequence messages_message_id_seq
-    as integer;
-
-alter sequence messages_message_id_seq owner to avnadmin;
-
-alter sequence messages_message_id_seq owned by messages.message_id;
 

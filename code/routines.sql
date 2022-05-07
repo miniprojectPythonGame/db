@@ -41,7 +41,7 @@ $$;
 
 alter function add_statistics(integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
 
-create function remove_statistics(hero_id_ integer) returns trigger
+create function remove_statistics() returns trigger
     language plpgsql
 as
 $$
@@ -52,7 +52,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_statistics(integer) owner to avnadmin;
+alter function remove_statistics() owner to avnadmin;
 
 create procedure remove_hero(IN hero_id_ integer)
     language plpgsql
@@ -66,7 +66,7 @@ $$;
 
 alter procedure remove_hero(integer) owner to avnadmin;
 
-create function remove_all_heroes(hero_id_ integer, item_id_ integer) returns trigger
+create function remove_all_heroes() returns trigger
     language plpgsql
 as
 $$
@@ -76,7 +76,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_all_heroes(integer, integer) owner to avnadmin;
+alter function remove_all_heroes() owner to avnadmin;
 
 create procedure use_dev_pts(IN hero_id_ integer)
     language plpgsql
@@ -89,7 +89,7 @@ begin
 end;
 $$;
 
-alter procedure use_dev_pts(integer, integer) owner to avnadmin;
+alter procedure use_dev_pts(integer) owner to avnadmin;
 
 create procedure add_exp(IN hero_id_ integer, IN exp_to_add integer)
     language plpgsql
@@ -129,29 +129,12 @@ declare curr_slots_amt int;
 BEGIN
     SELECT count(*) into curr_slots_amt from storage where hero_id = hero_id_;
     for r in curr_slots_amt..curr_slots_amt+empty_slots_amt-1 loop
-        insert into storage (item_slot_id, item_id, amount, available, hero_id) values (r,NULL,0,0,hero_id_);
+        insert into storage (item_slot_id, item_id, available, hero_id) values (r,NULL,0,hero_id_);
         end loop;
 end;
 $$;
 
 alter procedure add_empty_storage(integer, integer) owner to avnadmin;
-
-create procedure add_to_storage(IN hero_id_ integer, IN item_id_ integer, IN amount_ integer)
-    language plpgsql
-as
-$$
-declare
-    smallest_item_slot_id int;
-BEGIN
-    SELECT item_slot_id into smallest_item_slot_id from storage where hero_id = hero_id_ and item_slot_id > 10 and item_id is NULL order by item_slot_id limit 1;
-    update storage set item_id = item_id_ where item_slot_id = smallest_item_slot_id and hero_id = hero_id_;
-    update storage set amount = amount_ where item_slot_id = smallest_item_slot_id and hero_id = hero_id_;
-    update storage set available = 1 where item_slot_id = smallest_item_slot_id and hero_id = hero_id_;
-    update items set owner_id = hero_id_ where item_id = item_id_;
-end;
-$$;
-
-alter procedure add_to_storage(integer, integer, integer) owner to avnadmin;
 
 create procedure move_in_storage(IN hero_id_ integer, IN curr_item_slot_id integer, IN future_item_slot_id integer)
     language plpgsql
@@ -207,7 +190,6 @@ declare
 BEGIN
     select item_id into item_id_ from storage where hero_id = hero_id_ and item_slot_id = item_slot_id_;
     update storage set item_id = NULL where hero_id = hero_id_ and item_slot_id = item_slot_id_;
-    update storage set amount = 0 where hero_id = hero_id_ and item_slot_id = item_slot_id_;
     update storage set available = 0 where hero_id = hero_id_ and item_slot_id = item_slot_id_;
     update items set owner_id = NULL where item_id = item_id_;
 end;
@@ -336,7 +318,7 @@ begin
                        where item_id = item_id_)
     where hero_id = hero_id_;
 
-    call add_to_storage(hero_id_,item_id_,1);
+    call add_to_storage(hero_id_,item_id_);
 
     update armour_shop
     set item_id = (select item_id
@@ -364,13 +346,13 @@ begin
                        where item_id = item_id_)
     where hero_id = hero_id_;
 
-    call add_to_storage(hero_id_,item_id_,1);
+    call add_to_storage(hero_id_,item_id_);
 
     update magic_shop
     set item_id = (select item_id
                    from items
                    where owner_id is null
-                     AND item_type_id IN (0, 1, 2, 3, 4)
+                     AND item_type_id IN (5, 6, 7,11,12)
                    ORDER BY random()
                    LIMIT 1
     )
@@ -392,13 +374,13 @@ begin
                        where item_id = item_id_)
     where hero_id = hero_id_;
 
-    call add_to_storage(hero_id_,item_id_,1);
+    call add_to_storage(hero_id_,item_id_);
 
     update steed_shop
     set item_id = (select item_id
                    from items
                    where owner_id is null
-                     AND item_type_id IN (0, 1, 2, 3, 4)
+                     AND item_type_id = 8
                    ORDER BY random()
                    LIMIT 1
     )
@@ -420,13 +402,13 @@ begin
                        where item_id = item_id_)
     where hero_id = hero_id_;
 
-    call add_to_storage(hero_id_,item_id_,1);
+    call add_to_storage(hero_id_,item_id_);
 
     update steed_shop
     set item_id = (select item_id
                    from items
                    where owner_id is null
-                     AND item_type_id IN (0, 1, 2, 3, 4)
+                     AND item_type_id IN (9,10)
                    ORDER BY random()
                    LIMIT 1
     )
@@ -447,36 +429,11 @@ DECLARE last_login_time timestamp;
         IF date_part('day',NEW.login_time - last_login_time) >= 1 THEN --assumming that refresh comes after new login every day not every 24 hours
             EXECUTE refresh_all_shops_for_hero(NEW.hero_id);
         END IF;
+       RETURN NEW;
     END;
 $$;
 
 alter function trigger_refresh_all_shops() owner to avnadmin;
-
-create procedure create_new_buy_now_order(IN proc_buyer_id integer, IN proc_amount integer, IN proc_item_id integer, IN proc_target_unit_price integer)
-    language plpgsql
-as
-$$
-DECLARE
-    hero_exists integer;
-    item_exists integer;
-    hero_money integer;
-BEGIN
-    SELECT Count(*) FROM items WHERE item_id = proc_item_id GROUP BY item_id INTO item_exists;
-
-    SELECT Count(*) FROM heroes WHERE hero_id = proc_buyer_id GROUP BY  hero_id INTO hero_exists;
-
-    SELECT gold FROM heroes where hero_id = proc_buyer_id INTO hero_money;
-
-    IF hero_exists = 1 AND item_exists = 1 AND proc_target_unit_price*proc_amount <= hero_money THEN
-        INSERT INTO buy_orders (buyer_id, amount, item_id, target_unit_price, order_date)
-        VALUES (proc_buyer_id,proc_amount,proc_item_id,proc_target_unit_price, CURRENT_DATE);
-    ELSE
-        RAISE EXCEPTION 'New buy now order cannot be created';
-        END IF;
-END;
-$$;
-
-alter procedure create_new_buy_now_order(integer, integer, integer, integer) owner to avnadmin;
 
 create function place_bet(auctioned_item_id_ integer, bet integer, hero_id_ integer) returns character varying
     language plpgsql
@@ -555,75 +512,35 @@ as
 $$
 declare
     seller_hero_id int;
-    buyer_hero_id int;
-    price int;
-    item_id_ int;
-    item_slot_id_ int;
+    buyer_hero_id  int;
+    price          int;
+    item_id_       int;
+    item_slot_id_  int;
 begin
-    select seller_id,current_leader_id,current_price,item_id into seller_hero_id,buyer_hero_id,price,item_id_ from auctioned_items where auctioned_item_id = auctioned_item_id_;
-    select item_slot_id into item_slot_id_ from storage where hero_id = seller_hero_id and item_id = item_id_;
-    update heroes set gold = gold - price where hero_id = buyer_hero_id;
-    -- lets assume buyer has enough money - we will sort this out soon I promise
-    update heroes set gold = gold + price where hero_id = seller_hero_id;
-    call remove_from_storage(seller_hero_id,item_slot_id_);
-    call add_to_storage(buyer_hero_id,item_id_,1);
+    select seller_id, current_leader_id, current_price, item_id
+    into seller_hero_id,buyer_hero_id,price,item_id_
+    from auctioned_items
+    where auctioned_item_id = auctioned_item_id_;
+    if buyer_hero_id is not NULL THEN
+        select item_slot_id into item_slot_id_ from storage where hero_id = seller_hero_id and item_id = item_id_;
+        update heroes set gold = gold - price where hero_id = buyer_hero_id;
+        -- lets assume buyer has enough money - we will sort this out soon I promise
+        update heroes set gold = gold + price where hero_id = seller_hero_id;
+        call remove_from_storage(seller_hero_id, item_slot_id_);
+        call add_to_storage(buyer_hero_id, item_id_);
+    ELSE
+        UPDATE storage SET available = 1 WHERE hero_id = seller_hero_id AND item_slot_id = item_slot_id_;
+
+    end if;
+
+
     delete from auctioned_items where auctioned_item_id = auctioned_item_id_;
 
-    PERFORM cron.unschedule(concat(auctioned_item_id_,' ai_id')); -- remove job with id
+    PERFORM cron.unschedule(concat(auctioned_item_id_, ' ai_id')); -- remove job with id
 end
 $$;
 
 alter procedure resolve_auction(integer) owner to avnadmin;
-
-create procedure add_new_item_on_sale(IN proc_item_id integer, IN proc_storage_id integer, IN proc_seller_id integer, IN proc_start_or_selling_price integer, IN proc_amount integer, IN proc_what_type character varying, IN proc_if_auction_end_date timestamp without time zone)
-    language plpgsql
-as
-$$
-DECLARE
-    hero_exists              integer;
-    item_exists              integer;
-    items_available_for_sale integer;
-    auctioned_item_id_       int;
-BEGIN
-    SELECT Count(*) FROM items WHERE item_id = proc_item_id GROUP BY item_id INTO item_exists;
-
-    SELECT Count(*) FROM heroes WHERE hero_id = proc_seller_id GROUP BY hero_id INTO hero_exists;
-
-    SELECT COUNT(*)
-    FROM storage
-    WHERE storage_id = proc_storage_id
-      AND hero_id = proc_seller_id
-      AND amount >= proc_amount
-      AND available = 1
-    INTO items_available_for_sale;
-
-    IF hero_exists = 1 AND item_exists = 1 AND items_available_for_sale = 1 THEN
-        IF proc_what_type = 'auction' THEN
-            INSERT INTO auctioned_items(item_id, current_price, amount, start_price, seller_id, auction_end_date,
-                                        auction_start_date, storage_id)
-            VALUES (proc_item_id, proc_start_or_selling_price, proc_amount, proc_start_or_selling_price, proc_seller_id,
-                    proc_if_auction_end_date, current_timestamp, proc_storage_id)
-            returning auctioned_item_id into auctioned_item_id_;
-
-            call add_new_cron_job(
-                    proc_if_auction_end_date,
-                    concat(auctioned_item_id_, ' ai_id'),
-                    concat('call resolve_auction(''', auctioned_item_id_, ''');'));
-
-
-        ELSEIF proc_what_type = 'buy_now' THEN
-            INSERT INTO buy_now_items(item_id, selling_price, amount, seller_id, post_date, storage_id)
-            VALUES (proc_item_id, proc_start_or_selling_price, proc_amount, proc_seller_id, current_date,
-                    proc_storage_id);
-        END IF;
-    ELSE
-        RAISE NOTICE 'New offer cannot be created';
-    END IF;
-
-END;
-$$;
-
-alter procedure add_new_item_on_sale(integer, integer, integer, integer, integer, varchar, timestamp) owner to avnadmin;
 
 create function add_hero(avatar_id_ integer, name_ character varying, player_id_ character varying, hero_class_ character, strength_ integer, intelligence_ integer, dexterity_ integer, constitution_ integer, luck_ integer, persuasion_ integer, trade_ integer, leadership_ integer, protection_ integer, initiative_ integer) returns integer
     language plpgsql
@@ -665,48 +582,6 @@ end;
 $$;
 
 alter function filter_items(varchar, integer[], integer, integer, character[]) owner to avnadmin;
-
-create procedure buy_now(IN proc_buyer_id integer, IN proc_buy_now_item_id integer)
-    language plpgsql
-as
-$$
-declare
-    var_item_id           integer;
-    item_price            integer;
-    item_amount           integer;
-    buyer_gold            integer;
-    var_seller_id         integer;
-    var_seller_storage_id integer;
-begin
-    select item_id, seller_id, selling_price, amount, storage_id
-    from buy_now_items
-    where buy_now_items.buy_now_item_id = proc_buy_now_item_id
-    into var_item_id, var_seller_id, item_price, item_amount, var_seller_storage_id;
-    select gold from heroes where heroes.hero_id = proc_buyer_id into buyer_gold;
-    -- check if the hero has enough money
-    if item_price > buyer_gold then
-        raise exception 'You do not have enough gold to purchase this item';
-    end if;
-
-    -- delete the item from the seller
-    call remove_from_storage(var_seller_id, var_seller_storage_id);
-
-    -- pay for the item
-    update heroes
-    set gold = gold - item_price
-    where hero_id = proc_buyer_id;
-
-    -- give money to the seller
-    update heroes
-    set gold = gold + item_price
-    where hero_id = var_seller_id;
-
-    -- add to the buyer's storage
-    call add_to_storage(proc_buyer_id, proc_buy_now_item_id, item_amount);
-end;
-$$;
-
-alter procedure buy_now(integer, integer) owner to avnadmin;
 
 create procedure add_log(IN player_id_ character varying, IN login_status boolean)
     language plpgsql
@@ -750,6 +625,7 @@ DECLARE
             INSERT INTO blocked_users( player_id, block_start, block_end, reason)
             VALUES (NEW.player_id, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 day', 'Too many unsuccessful login attempts'); --blocking for 1 day, starting on last unsuccessful attempt
         END IF;
+        RETURN NEW;
     END
 $$;
 
@@ -792,8 +668,149 @@ begin
         call buy_now(buyer_id_, NEW.item_id);
         delete from buy_orders where buy_order_id = buy_order_id_;
     end if;
+
+    RETURN NEW;
 end
 $$;
 
 alter function check_buy_orders() owner to avnadmin;
+
+create procedure add_to_storage(IN hero_id_ integer, IN item_id_ integer)
+    language plpgsql
+as
+$$
+declare
+    smallest_item_slot_id int;
+BEGIN
+    SELECT item_slot_id into smallest_item_slot_id from storage where hero_id = hero_id_ and item_slot_id > 10 and item_id is NULL order by item_slot_id limit 1;
+    update storage set item_id = item_id_ where item_slot_id = smallest_item_slot_id and hero_id = hero_id_;
+    update storage set available = 1 where item_slot_id = smallest_item_slot_id and hero_id = hero_id_;
+    update items set owner_id = hero_id_ where item_id = item_id_;
+end;
+$$;
+
+alter procedure add_to_storage(integer, integer) owner to avnadmin;
+
+create procedure create_new_buy_now_order(IN buying_hero_id_ integer, IN item_id_ integer, IN price_ integer)
+    language plpgsql
+as
+$$
+DECLARE
+    hero_exists integer;
+    item_exists integer;
+    hero_money integer;
+BEGIN
+    SELECT Count(*) FROM items WHERE item_id = item_id_ GROUP BY item_id INTO item_exists;
+
+    SELECT Count(*) FROM heroes WHERE hero_id = buying_hero_id_ GROUP BY  hero_id INTO hero_exists;
+
+    SELECT gold FROM heroes where hero_id = buying_hero_id_ INTO hero_money;
+
+    IF hero_exists = 1 AND item_exists = 1 AND price_ <= hero_money THEN
+        INSERT INTO buy_orders (buyer_id, item_id, target_unit_price, order_date)
+        VALUES (buying_hero_id_,item_id_,price_, CURRENT_DATE);
+    ELSE
+        RAISE EXCEPTION 'New buy now order cannot be created';
+        END IF;
+END;
+$$;
+
+alter procedure create_new_buy_now_order(integer, integer, integer) owner to avnadmin;
+
+create procedure add_new_item_on_sale(IN item_id_ integer, IN storage_id_ integer, IN seller_id_ integer, IN start_or_selling_price_ integer, IN what_type_ character varying, IN if_auction_end_date_ timestamp without time zone DEFAULT NULL::timestamp without time zone)
+    language plpgsql
+as
+$$
+DECLARE
+    hero_exists              integer;
+    item_exists              integer;
+    items_available_for_sale integer;
+    auctioned_item_id_       int;
+BEGIN
+    SELECT Count(*) FROM items WHERE item_id = item_id_ GROUP BY item_id INTO item_exists;
+
+    SELECT Count(*) FROM heroes WHERE hero_id = seller_id_ GROUP BY hero_id INTO hero_exists;
+
+    SELECT COUNT(*)
+    FROM storage
+    WHERE storage_id = storage_id_
+      AND hero_id = seller_id_
+      AND available = 1
+    INTO items_available_for_sale;
+
+    IF hero_exists = 1 AND item_exists = 1 AND items_available_for_sale = 1 THEN
+        IF what_type_ = 'auction' THEN
+            UPDATE storage SET available = 0 WHERE storage_id = storage_id_;
+
+            INSERT INTO auctioned_items(item_id, current_price, start_price, seller_id, auction_end_date,
+                                        auction_start_date, storage_id)
+            VALUES (item_id_, start_or_selling_price_, start_or_selling_price_, seller_id_,
+                    if_auction_end_date_, current_timestamp, storage_id_)
+            returning auctioned_item_id into auctioned_item_id_;
+
+            call add_new_cron_job(
+                    if_auction_end_date_,
+                    concat(auctioned_item_id_, ' ai_id'),
+                    concat('call resolve_auction(''', auctioned_item_id_, ''');'));
+
+
+        ELSEIF what_type_ = 'buy_now' THEN
+            UPDATE storage SET available = 0 WHERE storage_id = storage_id_;
+            INSERT INTO buy_now_items(item_id, selling_price, seller_id, post_date, storage_id)
+            VALUES (item_id_, start_or_selling_price_, seller_id_, current_timestamp,
+                    storage_id_);
+        END IF;
+    ELSE
+        RAISE NOTICE 'New offer cannot be created';
+    END IF;
+
+END;
+$$;
+
+alter procedure add_new_item_on_sale(integer, integer, integer, integer, varchar, timestamp) owner to avnadmin;
+
+create procedure buy_now(IN buying_hero_id_ integer, IN buy_now_item_id_ integer)
+    language plpgsql
+as
+$$
+declare
+    var_item_id         integer;
+    item_price          integer;
+    buyer_gold          integer;
+    var_seller_id       integer;
+    seller_item_slot_id integer;
+begin
+    select s.item_id,seller_id, selling_price, s.item_slot_id
+    from buy_now_items
+             join storage s on buy_now_items.storage_id = s.storage_id
+    where buy_now_items.buy_now_item_id = buy_now_item_id_
+    into var_item_id,var_seller_id, item_price, seller_item_slot_id;
+    select gold from heroes where heroes.hero_id = buying_hero_id_ into buyer_gold;
+    -- check if the hero has enough money
+    if item_price > buyer_gold then
+        raise exception 'You do not have enough gold to purchase this item';
+    end if;
+
+    -- delete the item from the seller
+    call remove_from_storage(var_seller_id, seller_item_slot_id);
+
+    -- delete from buy_now_items
+    delete from buy_now_items where buy_now_item_id = buy_now_item_id_;
+
+    -- pay for the item
+    update heroes
+    set gold = gold - item_price
+    where hero_id = buying_hero_id_;
+
+    -- give money to the seller
+    update heroes
+    set gold = gold + item_price
+    where hero_id = var_seller_id;
+
+    -- add to the buyer's storage
+    call add_to_storage(buying_hero_id_, var_item_id);
+end;
+$$;
+
+alter procedure buy_now(integer, integer) owner to avnadmin;
 
