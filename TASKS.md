@@ -20,9 +20,7 @@
 - [x] job (lub odpowiednik) na koniec licytacji
 - [x] (?) dodanie licytacji
 - [x] betowanie w licytacji
-- [ ] testowanie 
-- [ ] buy_now_orders
-- [ ] buy_now
+- [ ] testowanie
 
 # Jędrzej
 
