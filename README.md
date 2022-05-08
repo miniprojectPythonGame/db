@@ -7,10 +7,6 @@
 - Backend: Python
 - Frontend: Pygame
 - Database dialect: PostgreSQL
-## Functionalities:
-- authentication
-- storing objects from the game 
-- market
-  - buy/sell orders
-  - buy now/bidding
-NPC shops
+
+## DB schema
+![alt text](https://github.com/miniprojectPythonGame/db/blob/master/docs/db_diagram.svg?raw=true)
