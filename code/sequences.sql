@@ -191,3 +191,17 @@ alter sequence stable_shop_id_seq owner to avnadmin;
 
 alter sequence stable_shop_id_seq owned by steed_shop.id;
 
+create sequence logs_log_id_seq
+    as integer;
+
+alter sequence logs_log_id_seq owner to avnadmin;
+
+alter sequence logs_log_id_seq owned by logs.log_id;
+
+create sequence blocked_users_block_id_seq
+    as integer;
+
+alter sequence blocked_users_block_id_seq owner to avnadmin;
+
+alter sequence blocked_users_block_id_seq owned by blocked_users.block_id;
+

@@ -423,14 +423,25 @@ create function trigger_refresh_all_shops() returns trigger
     language plpgsql
 as
 $$
-DECLARE last_login_time timestamp;
-    BEGIN
-       SELECT login_time FROM logs WHERE player_id = NEW.player_id ORDER BY login_time DESC LIMIT 1 INTO last_login_time;
-        IF date_part('day',NEW.login_time - last_login_time) >= 1 THEN --assumming that refresh comes after new login every day not every 24 hours
-            EXECUTE refresh_all_shops_for_hero(NEW.hero_id);
-        END IF;
-       RETURN NEW;
-    END;
+DECLARE
+    last_login_time timestamp;
+    hero_id_         int;
+    hours_passed_since_yesterday int;
+    hours_passed_in_interval interval;
+
+BEGIN
+    SELECT login_time FROM logs WHERE player_id = NEW.player_id ORDER BY login_time DESC LIMIT 1 INTO last_login_time;
+    SELECT EXTRACT(HOURS FROM CURRENT_TIMESTAMP) + 2 into hours_passed_since_yesterday;
+    SELECT concat(hours_passed_since_yesterday,' hour') into hours_passed_in_interval;
+
+    IF (select hours_passed_in_interval < current_timestamp - last_login_time) THEN --assumming that refresh comes after new login every day not every 24 hours
+        for hero_id_ in (select hero_id from heroes where player_id = NEW.player_id)
+            loop
+                call refresh_all_shops_for_hero(hero_id_);
+            end loop;
+    END IF;
+    RETURN NEW;
+END;
 $$;
 
 alter function trigger_refresh_all_shops() owner to avnadmin;
@@ -583,28 +594,6 @@ $$;
 
 alter function filter_items(varchar, integer[], integer, integer, character[]) owner to avnadmin;
 
-create procedure add_log(IN player_id_ character varying, IN login_status boolean)
-    language plpgsql
-as
-$$
-DECLARE
-    player_exists integer;
-BEGIN
-    SELECT Count(*) FROM players WHERE player_id = player_id_  GROUP BY  player_id INTO player_exists;
-
-    IF player_exists = 1 THEN
-        INSERT INTO logs (player_id, login_time, successful)
-        VALUES (player_id_,CURRENT_DATE, login_status);
-    ELSE
-        RAISE EXCEPTION 'Such player doesnt exist';
-    END IF;
-
-    COMMIT;
-END
-$$;
-
-alter procedure add_log(varchar, boolean) owner to avnadmin;
-
 create function trigger_block_user() returns trigger
     language plpgsql
 as
@@ -613,11 +602,11 @@ DECLARE
         first_attempt timestamp;
         second_attempt timestamp;
     BEGIN
-        IF NEW.successful = true THEN
-            RAISE EXCEPTION 'The login was successful';
+        IF NEW.login_status = true THEN
+            return NEW;
         END IF;
 
-       SELECT login_time FROM logs WHERE player_id = NEW.player_id AND successful = false
+       SELECT login_time FROM logs WHERE player_id = NEW.player_id AND login_status = false
        ORDER BY login_time DESC LIMIT 2 INTO second_attempt, first_attempt;
 
         IF (date_part('day',NEW.login_time - first_attempt)*24 + date_part('hour',NEW.login_time - first_attempt)) <= 0 THEN
@@ -813,4 +802,24 @@ end;
 $$;
 
 alter procedure buy_now(integer, integer) owner to avnadmin;
+
+create procedure add_log(IN player_id_ character varying, IN login_status_ boolean)
+    language plpgsql
+as
+$$
+DECLARE
+    player_exists integer;
+BEGIN
+    SELECT Count(*) FROM players WHERE player_id = player_id_  GROUP BY  player_id INTO player_exists;
+
+    IF player_exists = 1 THEN
+        INSERT INTO logs (player_id, login_time, login_status)
+        VALUES (player_id_,current_timestamp, login_status_);
+    ELSE
+        RAISE EXCEPTION 'Such player doesnt exist';
+    END IF;
+END
+$$;
+
+alter procedure add_log(varchar, boolean) owner to avnadmin;
 

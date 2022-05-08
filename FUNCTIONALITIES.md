@@ -1,4 +1,4 @@
-# Co już działa (a jak nie działa, to będzie naprawione do wtorku):
+# Co już działa:
 
 ## Market:
 - [x] dodawanie aukcji
@@ -15,13 +15,13 @@
 - [x] usuwanie graczy
 - [x] dodawanie bohaterów
 - [x] usuwanie bohaterów
-- [ ] dodawanie logów mówiacych o dacie zalogowania i czy się powiodło (trzeba dodać w backendzie) 
+- [x] dodawanie logów mówiacych o dacie zalogowania i czy się powiodło (trzeba dodać w backendzie) 
 
 
 ## Sklepy inne niż Market:
 - [x] kupowanie przedmiotów
 - [x] odświeżanie przedmiotów na życzenie (w przyszłości za opłatą)
-- [ ] odświeżanie sklepów przy pierwszym logowaniu danego dnia (bez obsługi logów nie da się sprawdzic)
+- [x] odświeżanie sklepów przy pierwszym logowaniu danego dnia (bez obsługi logów nie da się sprawdzic)
 - [x] sprzedaż przedmiotów do sklepu
 
 ## Statystyki i przedmioty:

@@ -333,12 +333,12 @@ create unique index messages_message_id_uindex
 
 create table logs
 (
-    log_id     integer     not null
+    log_id       serial
         primary key,
-    player_id  varchar(50) not null
+    player_id    varchar(50) not null
         references players,
-    login_time timestamp   not null,
-    successful boolean     not null
+    login_time   timestamp   not null,
+    login_status boolean     not null
 );
 
 alter table logs
@@ -358,7 +358,7 @@ execute procedure trigger_block_user();
 
 create table blocked_users
 (
-    block_id    integer     not null
+    block_id    serial
         primary key,
     player_id   varchar(50) not null
         references players,
