@@ -5,8 +5,8 @@
 - [x] licytowanie
 - [x] rozstrzyganie aukcji
 - [x] dodawanie kup teraz
-- [ ] dodawanie zlecenia kupna
-- [ ] realizowanie zlecenia kupna
+- [x] dodawanie zlecenia kupna
+- [x] realizowanie zlecenia kupna
 - [ ] natychmiastowe realizowanie zlecenia kupna jeśli już jest na rynku produkt o cenie <= temu co płacimy *=(raczej
   nie ma )
 
