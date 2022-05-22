@@ -41,7 +41,7 @@ $$;
 
 alter function add_statistics(integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
 
-create function remove_statistics() returns trigger
+create function remove_statistics(hero_id_ integer) returns trigger
     language plpgsql
 as
 $$
@@ -52,7 +52,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_statistics() owner to avnadmin;
+alter function remove_statistics(integer) owner to avnadmin;
 
 create procedure remove_hero(IN hero_id_ integer)
     language plpgsql
@@ -66,7 +66,7 @@ $$;
 
 alter procedure remove_hero(integer) owner to avnadmin;
 
-create function remove_all_heroes() returns trigger
+create function remove_all_heroes(hero_id_ integer, item_id_ integer) returns trigger
     language plpgsql
 as
 $$
@@ -76,7 +76,7 @@ BEGIN
 end;
 $$;
 
-alter function remove_all_heroes() owner to avnadmin;
+alter function remove_all_heroes(integer, integer) owner to avnadmin;
 
 create procedure use_dev_pts(IN hero_id_ integer)
     language plpgsql
@@ -89,7 +89,7 @@ begin
 end;
 $$;
 
-alter procedure use_dev_pts(integer) owner to avnadmin;
+alter procedure use_dev_pts(integer, integer) owner to avnadmin;
 
 create procedure add_exp(IN hero_id_ integer, IN exp_to_add integer)
     language plpgsql
@@ -446,36 +446,6 @@ $$;
 
 alter function trigger_refresh_all_shops() owner to avnadmin;
 
-create function place_bet(auctioned_item_id_ integer, bet integer, hero_id_ integer) returns character varying
-    language plpgsql
-as
-$$
-DECLARE
-BEGIN
-    if (select hero_id from heroes where hero_id = hero_id_) is NULL THEN
-        return 'No match for hero with that hero_id';
-    end if;
-    if (select gold from heroes where hero_id = hero_id_) < bet then
-        return 'Not enough coins brother';
-    end if;
-    if (select auction_end_date from auctioned_items where auctioned_item_id = auctioned_item_id_) is NULL THEN
-        return 'No match for item with that auctioned_item_id';
-    end if;
-    if bet <= 0 then
-        return 'Bet <= 0 - not sure about that';
-    end if;
-    if bet <= (select current_price from auctioned_items where auctioned_item_id = auctioned_item_id_) then
-        return 'Your bet is to low brother';
-    end if;
-
-    UPDATE auctioned_items SET current_price = bet where auctioned_item_id = auctioned_item_id_;
-    UPDATE auctioned_items SET current_leader_id = hero_id_ where auctioned_item_id = auctioned_item_id_;
-    return 'SUCCESS';
-END ;
-$$;
-
-alter function place_bet(integer, integer, integer) owner to avnadmin;
-
 create procedure add_new_cron_job(IN date timestamp without time zone, IN name character varying, IN procedure_call character varying)
     language plpgsql
 as
@@ -576,24 +546,6 @@ $$;
 
 alter function add_hero(integer, varchar, varchar, char, integer, integer, integer, integer, integer, integer, integer, integer, integer, integer) owner to avnadmin;
 
-create function filter_items(item_name character varying, item_types integer[], min_price integer, max_price integer, item_class character[])
-    returns TABLE(item_id integer)
-    language plpgsql
-as
-$$
-begin
-    select item_id
-    from items
-    where items.name ~* item_name
-      and items.item_type_id = any (item_types)
-      and min_price <= items.price
-      and items.price <= max_price
-      and items.for_class = any (item_class);
-end;
-$$;
-
-alter function filter_items(varchar, integer[], integer, integer, character[]) owner to avnadmin;
-
 create function trigger_block_user() returns trigger
     language plpgsql
 as
@@ -607,12 +559,12 @@ DECLARE
         END IF;
 
        SELECT login_time FROM logs WHERE player_id = NEW.player_id AND login_status = false
-       ORDER BY login_time DESC LIMIT 2 INTO second_attempt, first_attempt;
+       ORDER BY login_time LIMIT 2 INTO first_attempt,second_attempt;
 
-        IF (date_part('day',NEW.login_time - first_attempt)*24 + date_part('hour',NEW.login_time - first_attempt)) <= 0 THEN
+        IF (select date_part('day',current_timestamp - first_attempt)*24 + date_part('hour',current_timestamp - first_attempt)) <= 0 THEN
             --assumming that these unsuccessful attempts must be within 1 hour (0 because this expression returns number of full passed hours, i.e. 45 min diff will return 0 and 1h 1min diff will return 1
             INSERT INTO blocked_users( player_id, block_start, block_end, reason)
-            VALUES (NEW.player_id, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 day', 'Too many unsuccessful login attempts'); --blocking for 1 day, starting on last unsuccessful attempt
+            VALUES (NEW.player_id, current_timestamp, current_timestamp + INTERVAL '1 day', 'Too many unsuccessful login attempts'); --blocking for 1 day, starting on last unsuccessful attempt
         END IF;
         RETURN NEW;
     END
@@ -706,7 +658,27 @@ $$;
 
 alter procedure create_new_buy_now_order(integer, integer, integer) owner to avnadmin;
 
-create procedure add_new_item_on_sale(IN item_id_ integer, IN storage_id_ integer, IN seller_id_ integer, IN start_or_selling_price_ integer, IN what_type_ character varying, IN if_auction_end_date_ timestamp without time zone DEFAULT NULL::timestamp without time zone)
+create procedure add_log(IN player_id_ character varying, IN login_status_ boolean)
+    language plpgsql
+as
+$$
+DECLARE
+    player_exists integer;
+BEGIN
+    SELECT Count(*) FROM players WHERE player_id = player_id_  GROUP BY  player_id INTO player_exists;
+
+    IF player_exists = 1 THEN
+        INSERT INTO logs (player_id, login_time, login_status)
+        VALUES (player_id_,current_timestamp, login_status_);
+    ELSE
+        RAISE EXCEPTION 'Such player doesnt exist';
+    END IF;
+END
+$$;
+
+alter procedure add_log(varchar, boolean) owner to avnadmin;
+
+create procedure add_new_item_on_sale(IN item_id_ integer, IN seller_id_ integer, IN start_or_selling_price_ integer, IN what_type_ character varying, IN if_auction_end_date_ timestamp without time zone DEFAULT NULL::timestamp without time zone)
     language plpgsql
 as
 $$
@@ -715,17 +687,20 @@ DECLARE
     item_exists              integer;
     items_available_for_sale integer;
     auctioned_item_id_       int;
+    storage_id_              int;
 BEGIN
     SELECT Count(*) FROM items WHERE item_id = item_id_ GROUP BY item_id INTO item_exists;
 
     SELECT Count(*) FROM heroes WHERE hero_id = seller_id_ GROUP BY hero_id INTO hero_exists;
 
+    select storage_id from storage where item_id = item_id_ and hero_id = seller_id_ into storage_id_;
+
     SELECT COUNT(*)
     FROM storage
     WHERE storage_id = storage_id_
-      AND hero_id = seller_id_
       AND available = 1
     INTO items_available_for_sale;
+
 
     IF hero_exists = 1 AND item_exists = 1 AND items_available_for_sale = 1 THEN
         IF what_type_ = 'auction' THEN
@@ -756,32 +731,33 @@ BEGIN
 END;
 $$;
 
-alter procedure add_new_item_on_sale(integer, integer, integer, integer, varchar, timestamp) owner to avnadmin;
+alter procedure add_new_item_on_sale(integer, integer, integer, varchar, timestamp) owner to avnadmin;
 
-create procedure buy_now(IN buying_hero_id_ integer, IN buy_now_item_id_ integer)
+create procedure buy_now(IN buyer_id_ integer, IN item_id_ integer, IN seller_id_ integer)
     language plpgsql
 as
 $$
 declare
-    var_item_id         integer;
     item_price          integer;
     buyer_gold          integer;
-    var_seller_id       integer;
     seller_item_slot_id integer;
+    buy_now_item_id_ int;
 begin
+    select buy_now_item_id from buy_now_items where item_id = item_id_ and seller_id = seller_id_ into buy_now_item_id_;
+
     select s.item_id,seller_id, selling_price, s.item_slot_id
-    from buy_now_items
-             join storage s on buy_now_items.storage_id = s.storage_id
-    where buy_now_items.buy_now_item_id = buy_now_item_id_
-    into var_item_id,var_seller_id, item_price, seller_item_slot_id;
-    select gold from heroes where heroes.hero_id = buying_hero_id_ into buyer_gold;
+    from buy_now_items bni
+             join storage s on bni.storage_id = s.storage_id
+    where bni.buy_now_item_id = buy_now_item_id_
+    into item_id_,seller_id_, item_price, seller_item_slot_id;
+    select gold from heroes where heroes.hero_id = buyer_id_ into buyer_gold;
     -- check if the hero has enough money
     if item_price > buyer_gold then
         raise exception 'You do not have enough gold to purchase this item';
     end if;
 
     -- delete the item from the seller
-    call remove_from_storage(var_seller_id, seller_item_slot_id);
+    call remove_from_storage(seller_id_, seller_item_slot_id);
 
     -- delete from buy_now_items
     delete from buy_now_items where buy_now_item_id = buy_now_item_id_;
@@ -789,37 +765,87 @@ begin
     -- pay for the item
     update heroes
     set gold = gold - item_price
-    where hero_id = buying_hero_id_;
+    where hero_id = buyer_id_;
 
     -- give money to the seller
     update heroes
     set gold = gold + item_price
-    where hero_id = var_seller_id;
+    where hero_id = seller_id_;
 
     -- add to the buyer's storage
-    call add_to_storage(buying_hero_id_, var_item_id);
+    call add_to_storage(buyer_id_, item_id_);
 end;
 $$;
 
-alter procedure buy_now(integer, integer) owner to avnadmin;
+alter procedure buy_now(integer, integer, integer) owner to avnadmin;
 
-create procedure add_log(IN player_id_ character varying, IN login_status_ boolean)
+create function place_bet(item_id_ integer, seller_id_ integer, bet_ integer, buyer_id_ integer) returns character varying
     language plpgsql
 as
 $$
 DECLARE
-    player_exists integer;
+    auctioned_item_id_ int;
 BEGIN
-    SELECT Count(*) FROM players WHERE player_id = player_id_  GROUP BY  player_id INTO player_exists;
+    select auctioned_item_id
+    from auctioned_items
+    where item_id = item_id_ and seller_id = seller_id_
+    into auctioned_item_id_;
 
-    IF player_exists = 1 THEN
-        INSERT INTO logs (player_id, login_time, login_status)
-        VALUES (player_id_,current_timestamp, login_status_);
-    ELSE
-        RAISE EXCEPTION 'Such player doesnt exist';
-    END IF;
-END
+    if (select hero_id from heroes where hero_id = buyer_id_) is NULL THEN
+        return 'No match for hero with that hero_id';
+    end if;
+    if (select gold from heroes where hero_id = buyer_id_) < bet_ then
+        return 'Not enough coins brother';
+    end if;
+    if (select auction_end_date from auctioned_items where auctioned_item_id = auctioned_item_id_) is NULL THEN
+        return 'No match for item with that auctioned_item_id';
+    end if;
+    if bet_ <= 0 then
+        return 'Bet <= 0 - not sure about that';
+    end if;
+    if bet_ <= (select current_price from auctioned_items where auctioned_item_id = auctioned_item_id_) then
+        return 'Your bet is to low brother';
+    end if;
+
+    UPDATE auctioned_items SET current_price = bet_ where auctioned_item_id = auctioned_item_id_;
+    UPDATE auctioned_items SET current_leader_id = buyer_id_ where auctioned_item_id = auctioned_item_id_;
+    return 'SUCCESS';
+END ;
 $$;
 
-alter procedure add_log(varchar, boolean) owner to avnadmin;
+alter function place_bet(integer, integer, integer, integer) owner to avnadmin;
+
+create function trigger_setup_hero() returns trigger
+    language plpgsql
+as
+$$
+DECLARE
+    BEGIN
+        call add_empty_storage(NEW.hero_id,31);
+        call add_empty_shops_for_hero(NEW.hero_id);
+        call refresh_all_shops_for_hero(NEW.hero_id);
+        RETURN NEW;
+    END
+$$;
+
+alter function trigger_setup_hero() owner to avnadmin;
+
+create function filter_items(item_name character varying, item_types integer[], min_price integer, max_price integer, item_class "char"[])
+    returns TABLE(item_id integer)
+    language plpgsql
+as
+$$
+begin
+    return query select bni.item_id
+    from buy_now_items bni
+    join items i on bni.item_id = i.item_id
+    where i.name ~* item_name
+      and i.item_type_id = any (item_types)
+      and min_price <= bni.selling_price
+      and bni.selling_price <= max_price
+      and i.for_class = any (item_class);
+end;
+$$;
+
+alter function filter_items(varchar, integer[], integer, integer, "char"[]) owner to avnadmin;
 
