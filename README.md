@@ -12,4 +12,14 @@
 ![alt text](https://github.com/miniprojectPythonGame/db/blob/master/docs/db_diagram.svg?raw=true)  
 
 ## Database guidebook  
+**Authentication**  
+**Market**  
+- *auctions*  
+- *buy now*
 
+
+**NPC shops**
+Most (all?) of the functionalities are provided by the database.  
+Using the *logs* table we determine whether the shops should be refreshed with the trigger *refresh_all_shops_for_hero* ...  
+**Filters?**  
+**Anything else???***
