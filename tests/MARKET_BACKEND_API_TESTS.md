@@ -68,5 +68,5 @@
 ![results](../docs/tests/market_backend_api_tests/tests_working.png)
 
 ### Aim of the tests?
-I wonted to verify whether both adding and using buy_now & auctioning on the market is working.
+I wanted to verify whether both adding and using buy_now & auctioning on the market is working.
 It appears to be so.
