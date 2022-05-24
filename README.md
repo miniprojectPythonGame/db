@@ -9,4 +9,7 @@
 - Database dialect: PostgreSQL
 
 ## DB schema
-![alt text](https://github.com/miniprojectPythonGame/db/blob/master/docs/db_diagram.svg?raw=true)
+![alt text](https://github.com/miniprojectPythonGame/db/blob/master/docs/db_diagram.svg?raw=true)  
+
+## Database guidebook  
+
