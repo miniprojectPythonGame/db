@@ -18,6 +18,7 @@
 - Storing blocked users :arrow_right: Table *blocked_users* line 359 [here](https://github.com/miniprojectPythonGame/db/blob/master/code/creating_tables.sql)
 - Names of procedures & functions & triggers
   - trigger_block_user
+  - add_log
   
 ### Market
 - All procedures code :arrow_right: [here](https://github.com/miniprojectPythonGame/db/blob/master/code/routines.sql)
@@ -64,6 +65,7 @@
   - sell_item_from_weapon_shop
   - trigger_refresh_all_shops
   - remove_from_storage
+  - add_to_storage
   - refresh_all_shops_for_hero  
   
  *NPC Armour shop tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/BUYING_FROM_NPC.md)
