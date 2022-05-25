@@ -22,13 +22,16 @@
 ### Market
 - All procedures code :arrow_right: [here](https://github.com/miniprojectPythonGame/db/blob/master/code/routines.sql)
 - API Market handling :arrow_right: [here](https://github.com/miniprojectPythonGame/merged/blob/master/api/game_classes/objects/buildings/market.py)
+- *API market tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/BUYING_FROM_NPC.md)
 
 #### Auctions 
 - Names of procedures & functions & triggers
   - place_bet
   - resolve_auction
   - add_new_item_on_sale
-  - add_finalizing_auction
+  - add_finalizing_auction  
+ 
+ *Auctions market tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/MARKET_BACKEND_API_TESTS.md)
   
 #### Buy now
 - Names of procedures & functions & triggers
@@ -38,15 +41,20 @@
 #### Buy orders 
 - Names of procedures & functions & triggers
   - create_new_buy_now_order
-  - check_buy_orders
+  - check_buy_orders  
+  
+  *Buy now market tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/BUY_NOW.md)
   
 #### Filtering 
 - Names of procedures & functions & triggers
-  - filter_items
+  - filter_items  
+ 
+ *Filtering tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/FILTERING.md)
 
 ### Auxiliary functions
 - Names of procedures & functions & triggers
-  - add_new_cron_job
+  - add_new_cron_job  
+ 
 
 ### NPC shops
 - Names of procedures & functions & triggers
@@ -56,4 +64,6 @@
   - sell_item_from_weapon_shop
   - trigger_refresh_all_shops
   - remove_from_storage
-  - refresh_all_shops_for_hero
+  - refresh_all_shops_for_hero  
+  
+ *NPC Armour shop tests* :arrow_right: [here](https://github.com/miniprojectPythonGame/db/tree/master/tests/BUYING_FROM_NPC.md)
