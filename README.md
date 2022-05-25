@@ -20,7 +20,7 @@
   - trigger_block_user
   
 ### Market
-- All procedures code [here](https://github.com/miniprojectPythonGame/db/blob/master/code/routines.sql)
+- All procedures code :arrow_right: [here](https://github.com/miniprojectPythonGame/db/blob/master/code/routines.sql)
 - API Market handling :arrow_right: [here](https://github.com/miniprojectPythonGame/merged/blob/master/api/game_classes/objects/buildings/market.py)
 
 #### Auctions 
