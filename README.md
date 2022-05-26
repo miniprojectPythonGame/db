@@ -11,7 +11,8 @@
 ## DB schema
 ![alt text](https://github.com/miniprojectPythonGame/db/blob/master/docs/db_diagram.svg?raw=true)  
 
-##### Database guidebook  
+## Database guidebook  
+
 ### Authentication  
 - API authentication :arrow_right: [here](https://github.com/miniprojectPythonGame/merged/blob/master/api/web/user.py)
 - Storing user login info :arrow_right: Table *logs* line 334 [here](https://github.com/miniprojectPythonGame/db/blob/master/code/creating_tables.sql)
